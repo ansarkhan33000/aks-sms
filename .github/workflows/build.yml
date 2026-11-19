@@ -20,14 +20,19 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.4'
 
-    - name: Generate Full AKS SMS Project
+    - name: Generate Clean AKS SMS Project
       run: |
-        mkdir -p app/src/main/java/com/aks/sms
-        mkdir -p app/src/main/res/layout
+        python3 - << 'PYEOF'
+        import os
 
-        cat << 'EOF' > settings.gradle.kts
-        pluginManagement {
+        os.makedirs("app/src/main/java/com/aks/sms", exist_ok=True)
+        os.makedirs("app/src/main/res/layout", exist_ok=True)
+
+        files = {
+            "settings.gradle.kts": '''pluginManagement {
             repositories {
                 google()
                 mavenCentral()
@@ -41,25 +46,22 @@ jobs:
                 mavenCentral()
             }
         }
-        rootProject.name = "AKS SMS"
+        rootProject.name = "AKS_SMS"
         include(":app")
-        EOF
+        ''',
 
-        cat << 'EOF' > build.gradle.kts
-        plugins {
+            "build.gradle.kts": '''plugins {
             id("com.android.application") version "8.2.2" apply false
             id("org.jetbrains.kotlin.android") version "1.9.22" apply false
         }
-        EOF
+        ''',
 
-        cat << 'EOF' > gradle.properties
-        org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+            "gradle.properties": '''org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
         android.useAndroidX=true
         kotlin.code.style=official
-        EOF
+        ''',
 
-        cat << 'EOF' > app/build.gradle.kts
-        plugins {
+            "app/build.gradle.kts": '''plugins {
             id("com.android.application")
             id("org.jetbrains.kotlin.android")
         }
@@ -91,10 +93,9 @@ jobs:
             implementation("androidx.appcompat:appcompat:1.6.1")
             implementation("com.google.android.material:material:1.11.0")
         }
-        EOF
+        ''',
 
-        cat << 'EOF' > app/src/main/AndroidManifest.xml
-        <?xml version="1.0" encoding="utf-8"?>
+            "app/src/main/AndroidManifest.xml": '''<?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.SEND_SMS" />
             <uses-permission android:name="android.permission.RECEIVE_SMS" />
@@ -115,10 +116,9 @@ jobs:
                 </activity>
             </application>
         </manifest>
-        EOF
+        ''',
 
-        cat << 'EOF' > app/src/main/res/layout/activity_main.xml
-        <?xml version="1.0" encoding="utf-8"?>
+            "app/src/main/res/layout/activity_main.xml": '''<?xml version="1.0" encoding="utf-8"?>
         <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -256,10 +256,9 @@ jobs:
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
-        EOF
+        ''',
 
-        cat << 'EOF' > app/src/main/java/com/aks/sms/MainActivity.kt
-        package com.aks.sms
+            "app/src/main/java/com/aks/sms/MainActivity.kt": '''package com.aks.sms
 
         import android.Manifest
         import android.content.*
@@ -290,7 +289,7 @@ jobs:
                             val sender = msg.originatingAddress ?: ""
                             if (sender.contains("668")) {
                                 val body = msg.messageBody ?: ""
-                                val entry = "CNIC: $lastSentCnic\nReply: $body\n----------------\n"
+                                val entry = "CNIC: $lastSentCnic\\nReply:$body\\n----------------\\n"
                                 tvResults.append(entry)
                             }
                         }
@@ -306,111 +305,4 @@ jobs:
                 val etDelay = findViewById<EditText>(R.id.etDelay)
                 val etCnics = findViewById<EditText>(R.id.etCnics)
                 val btnStart = findViewById<Button>(R.id.btnStart)
-                val btnStop = findViewById<Button>(R.id.btnStop)
-                val btnCopy = findViewById<Button>(R.id.btnCopy)
-                val btnWhatsApp = findViewById<Button>(R.id.btnWhatsApp)
-                tvStatus = findViewById(R.id.tvStatus)
-                tvResults = findViewById(R.id.tvResults)
-
-                checkPermissions()
-                registerReceiver(smsReceiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
-
-                btnStart.setOnClickListener {
-                    if (!checkPermissions()) return@setOnClickListener
-                    val list = etCnics.text.toString().lines().map { it.trim() }.filter { it.isNotEmpty() }
-                    if (list.isEmpty()) {
-                        Toast.makeText(this, "Enter at least 1 CNIC", Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    }
-                    val delaySec = (etDelay.text.toString().toIntOrNull() ?: 5).coerceIn(1, 50)
-                    val simSlot = if (rbSim1.isChecked) 0 else 1
-                    isRunning = true
-                    sendNext(list, 0, delaySec, simSlot)
-                }
-
-                btnStop.setOnClickListener {
-                    isRunning = false
-                    handler.removeCallbacksAndMessages(null)
-                    tvStatus.text = "Status: Stopped"
-                }
-
-                btnCopy.setOnClickListener {
-                    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    clipboard.setPrimaryClip(ClipData.newPlainText("AKS SMS Data", tvResults.text.toString()))
-                    Toast.makeText(this, "Data Copied!", Toast.LENGTH_SHORT).show()
-                }
-
-                btnWhatsApp.setOnClickListener {
-                    val url = "https://wa.me/923333997576"
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                }
-            }
-
-            private fun sendNext(list: List<String>, index: Int, delaySec: Int, simSlot: Int) {
-                if (!isRunning || index >= list.size) {
-                    isRunning = false
-                    tvStatus.text = "Status: Completed"
-                    return
-                }
-                val cnic = list[index]
-                lastSentCnic = cnic
-                tvStatus.text = "Sending (${index + 1}/${list.size}): $cnic"
-                sendSmsViaSim(cnic, simSlot)
-
-                handler.postDelayed({
-                    sendNext(list, index + 1, delaySec, simSlot)
-                }, delaySec * 1000L)
-            }
-
-            private fun sendSmsViaSim(text: String, simSlot: Int) {
-                try {
-                    val subManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                        val subList = subManager.activeSubscriptionInfoList
-                        val subId = if (!subList.isNullOrEmpty() && simSlot < subList.size) {
-                            subList[simSlot].subscriptionId
-                        } else {
-                            SmsManager.getDefaultSmsSubscriptionId()
-                        }
-                        val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
-                        } else {
-                            @Suppress("DEPRECATION")
-                            SmsManager.getSmsManagerForSubscriptionId(subId)
-                        }
-                        smsManager.sendTextMessage("668", null, text, null, null)
-                    }
-                } catch (e: Exception) {
-                    tvStatus.text = "Error: ${e.message}"
-                }
-            }
-
-            private fun checkPermissions(): Boolean {
-                val perms = arrayOf(
-                    Manifest.permission.SEND_SMS,
-                    Manifest.permission.RECEIVE_SMS,
-                    Manifest.permission.READ_SMS,
-                    Manifest.permission.READ_PHONE_STATE
-                )
-                val needed = perms.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
-                return if (needed.isNotEmpty()) {
-                    ActivityCompat.requestPermissions(this, needed.toTypedArray(), 101)
-                    false
-                } else true
-            }
-
-            override fun onDestroy() {
-                super.onDestroy()
-                unregisterReceiver(smsReceiver)
-            }
-        }
-        EOF
-
-    - name: Build Debug APK
-      run: gradle assembleDebug
-
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: AKS-SMS-APK
-        path: app/build/outputs/apk/debug/app-debug.apk
+                val btn

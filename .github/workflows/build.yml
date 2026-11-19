@@ -1,398 +1,416 @@
 name: Build AKS SMS APK
-on: [push, workflow_dispatch]
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Setup JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
+    - uses: actions/checkout@v4
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-      - name: Generate Complete Project
-        run: |
-          python3 - << 'PYEOF'
-          import os
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
 
-          os.makedirs("app/src/main/java/com/aks/sms", exist_ok=True)
-          os.makedirs("app/src/main/res/layout", exist_ok=True)
+    - name: Generate Full AKS SMS Project
+      run: |
+        mkdir -p app/src/main/java/com/aks/sms
+        mkdir -p app/src/main/res/layout
 
-          files = {
-              "settings.gradle": 'rootProject.name = "AKS SMS"\ninclude ":app"\n',
-              "gradle.properties": "android.useAndroidX=true\norg.gradle.jvmargs=-Xmx2048m\n",
-              "build.gradle": '''buildscript {
-              repositories { google(); mavenCentral() }
-              dependencies {
-                  classpath "com.android.tools.build:gradle:8.2.2"
-                  classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22"
-              }
-          }
-          allprojects {
-              repositories { google(); mavenCentral() }
-          }
-          ''',
-              "app/build.gradle": '''plugins {
-              id "com.android.application"
-              id "org.jetbrains.kotlin.android"
-          }
-          android {
-              namespace "com.aks.sms"
-              compileSdk 34
-              defaultConfig {
-                  applicationId "com.aks.sms"
-                  minSdk 23
-                  targetSdk 34
-                  versionCode 1
-                  versionName "1.0"
-              }
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_17
-                  targetCompatibility JavaVersion.VERSION_17
-              }
-              kotlinOptions { jvmTarget = "17" }
-          }
-          dependencies {
-              implementation "androidx.core:core-ktx:1.12.0"
-              implementation "androidx.appcompat:appcompat:1.6.1"
-              implementation "com.google.android.material:material:1.11.0"
-          }
-          ''',
-              "app/src/main/AndroidManifest.xml": '''<?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.SEND_SMS" />
-              <uses-permission android:name="android.permission.RECEIVE_SMS" />
-              <uses-permission android:name="android.permission.READ_SMS" />
-              <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-              <application
-                  android:allowBackup="true"
-                  android:label="AKS SMS"
-                  android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
-                  <activity android:name=".MainActivity" android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          ''',
-              "app/src/main/res/layout/activity_main.xml": '''<?xml version="1.0" encoding="utf-8"?>
-          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:padding="16dp"
-              android:background="#F5F5F5">
-              <TextView
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="AKS SMS - 668 Auto Check"
-                  android:textSize="20sp"
-                  android:textStyle="bold"
-                  android:textColor="#1B5E20"
-                  android:gravity="center"
-                  android:layout_marginBottom="10dp"/>
-              <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:layout_marginBottom="8dp">
-                  <Spinner
-                      android:id="@+id/simSpinner"
-                      android:layout_width="0dp"
-                      android:layout_height="48dp"
-                      android:layout_weight="1"
-                      android:background="#FFFFFF"
-                      android:layout_marginEnd="8dp"/>
-                  <EditText
-                      android:id="@+id/delayInput"
-                      android:layout_width="110dp"
-                      android:layout_height="48dp"
-                      android:hint="Delay (1-50s)"
-                      android:text="5"
-                      android:inputType="number"
-                      android:background="#FFFFFF"
-                      android:padding="8dp"/>
-              </LinearLayout>
-              <EditText
-                  android:id="@+id/cnicInput"
-                  android:layout_width="match_parent"
-                  android:layout_height="120dp"
-                  android:hint="CNIC Numbers likhain (Har line mein ek CNIC)"
-                  android:inputType="textMultiLine"
-                  android:gravity="top"
-                  android:background="#FFFFFF"
-                  android:padding="10dp"
-                  android:layout_marginBottom="8dp"/>
-              <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:layout_marginBottom="8dp">
-                  <Button
-                      android:id="@+id/startBtn"
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:text="Start Sending"
-                      android:backgroundTint="#2E7D32"
-                      android:textColor="#FFFFFF"
-                      android:layout_marginEnd="4dp"/>
-                  <Button
-                      android:id="@+id/stopBtn"
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:text="Stop"
-                      android:backgroundTint="#C62828"
-                      android:textColor="#FFFFFF"
-                      android:layout_marginStart="4dp"/>
-              </LinearLayout>
-              <TextView
-                  android:id="@+id/statusText"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="Status: Ready"
-                  android:textStyle="bold"
-                  android:layout_marginBottom="6dp"/>
-              <ScrollView
-                  android:layout_width="match_parent"
-                  android:layout_height="0dp"
-                  android:layout_weight="1"
-                  android:background="#FFFFFF"
-                  android:padding="8dp"
-                  android:layout_marginBottom="8dp">
-                  <TextView
-                      android:id="@+id/resultText"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="668 ke jawabat yahan nazar ayenge..."
-                      android:textColor="#000000"
-                      android:textSize="14sp"/>
-              </ScrollView>
-              <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal">
-                  <Button
-                      android:id="@+id/copyBtn"
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:text="Copy Results"
-                      android:backgroundTint="#1565C0"
-                      android:textColor="#FFFFFF"
-                      android:layout_marginEnd="4dp"/>
-                  <Button
-                      android:id="@+id/whatsappBtn"
-                      android:layout_width="0dp"
-                      android:layout_height="wrap_content"
-                      android:layout_weight="1"
-                      android:text="WhatsApp Help"
-                      android:backgroundTint="#00897B"
-                      android:textColor="#FFFFFF"
-                      android:layout_marginStart="4dp"/>
-              </LinearLayout>
-          </LinearLayout>
-          ''',
-              "app/src/main/java/com/aks/sms/MainActivity.kt": '''package com.aks.sms
+        cat << 'EOF' > settings.gradle.kts
+        pluginManagement {
+            repositories {
+                google()
+                mavenCentral()
+                gradlePluginPortal()
+            }
+        }
+        dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+        rootProject.name = "AKS SMS"
+        include(":app")
+        EOF
 
-          import android.Manifest
-          import android.content.*
-          import android.content.pm.PackageManager
-          import android.net.Uri
-          import android.os.*
-          import android.provider.Telephony
-          import android.telephony.SmsManager
-          import android.telephony.SubscriptionInfo
-          import android.telephony.SubscriptionManager
-          import android.widget.*
-          import androidx.appcompat.app.AppCompatActivity
-          import androidx.core.app.ActivityCompat
+        cat << 'EOF' > build.gradle.kts
+        plugins {
+            id("com.android.application") version "8.2.2" apply false
+            id("org.jetbrains.kotlin.android") version "1.9.22" apply false
+        }
+        EOF
 
-          class MainActivity : AppCompatActivity() {
-              private lateinit var simSpinner: Spinner
-              private lateinit var delayInput: EditText
-              private lateinit var cnicInput: EditText
-              private lateinit var startBtn: Button
-              private lateinit var stopBtn: Button
-              private lateinit var statusText: TextView
-              private lateinit var resultText: TextView
-              private lateinit var copyBtn: Button
-              private lateinit var whatsappBtn: Button
+        cat << 'EOF' > gradle.properties
+        org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+        android.useAndroidX=true
+        kotlin.code.style=official
+        EOF
 
-              private var isRunning = false
-              private val handler = Handler(Looper.getMainLooper())
-              private var cnicList = listOf<String>()
-              private var currentIndex = 0
-              private var lastSentCnic = ""
-              private var subList = listOf<SubscriptionInfo>()
+        cat << 'EOF' > app/build.gradle.kts
+        plugins {
+            id("com.android.application")
+            id("org.jetbrains.kotlin.android")
+        }
+        android {
+            namespace = "com.aks.sms"
+            compileSdk = 34
+            defaultConfig {
+                applicationId = "com.aks.sms"
+                minSdk = 22
+                targetSdk = 34
+                versionCode = 1
+                versionName = "1.0"
+            }
+            buildTypes {
+                release {
+                    isMinifyEnabled = false
+                }
+            }
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
+            }
+            kotlinOptions {
+                jvmTarget = "17"
+            }
+        }
+        dependencies {
+            implementation("androidx.core:core-ktx:1.12.0")
+            implementation("androidx.appcompat:appcompat:1.6.1")
+            implementation("com.google.android.material:material:1.11.0")
+        }
+        EOF
 
-              private val smsReceiver = object : BroadcastReceiver() {
-                  override fun onReceive(context: Context?, intent: Intent?) {
-                      if (Telephony.Sms.Intents.SMS_RECEIVED_ACTION == intent?.action) {
-                          val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-                          val fullBody = StringBuilder()
-                          var sender = ""
-                          for (msg in messages) {
-                              sender = msg.originatingAddress ?: ""
-                              fullBody.append(msg.messageBody)
-                          }
-                          if (sender.contains("668")) {
-                              val entry = "CNIC: $lastSentCnic\\nReply (668):\\n$fullBody\\n--------------------\\n"
-                              resultText.append(entry)
-                          }
-                      }
-                  }
-              }
+        cat << 'EOF' > app/src/main/AndroidManifest.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.SEND_SMS" />
+            <uses-permission android:name="android.permission.RECEIVE_SMS" />
+            <uses-permission android:name="android.permission.READ_SMS" />
+            <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
-              override fun onCreate(savedInstanceState: Bundle?) {
-                  super.onCreate(savedInstanceState)
-                  setContentView(R.layout.activity_main)
+            <application
+                android:allowBackup="true"
+                android:label="AKS SMS"
+                android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
+                <activity
+                    android:name=".MainActivity"
+                    android:exported="true">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                </activity>
+            </application>
+        </manifest>
+        EOF
 
-                  simSpinner = findViewById(R.id.simSpinner)
-                  delayInput = findViewById(R.id.delayInput)
-                  cnicInput = findViewById(R.id.cnicInput)
-                  startBtn = findViewById(R.id.startBtn)
-                  stopBtn = findViewById(R.id.stopBtn)
-                  statusText = findViewById(R.id.statusText)
-                  resultText = findViewById(R.id.resultText)
-                  copyBtn = findViewById(R.id.copyBtn)
-                  whatsappBtn = findViewById(R.id.whatsappBtn)
+        cat << 'EOF' > app/src/main/res/layout/activity_main.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#F4F6F8">
 
-                  checkPermissions()
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                  startBtn.setOnClickListener { startSending() }
-                  stopBtn.setOnClickListener {
-                      isRunning = false
-                      handler.removeCallbacksAndMessages(null)
-                      statusText.text = "Status: Stopped"
-                  }
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="AKS SMS - 668 Auto Verifier"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#00695C"
+                    android:gravity="center"
+                    android:paddingBottom="12dp" />
 
-                  copyBtn.setOnClickListener {
-                      val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                      val clip = ClipData.newPlainText("AKS SMS Results", resultText.text.toString())
-                      clipboard.setPrimaryClip(clip)
-                      Toast.makeText(this, "Data Copy Ho Gaya!", Toast.LENGTH_SHORT).show()
-                  }
+                <RadioGroup
+                    android:id="@+id/simGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:paddingBottom="8dp">
+                    <RadioButton
+                        android:id="@+id/rbSim1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SIM 1"
+                        android:checked="true"
+                        android:layout_marginEnd="24dp" />
+                    <RadioButton
+                        android:id="@+id/rbSim2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SIM 2" />
+                </RadioGroup>
 
-                  whatsappBtn.setOnClickListener {
-                      val url = "https://wa.me/923333997576?text=Assalam-o-Alaikum%20AKS%20SMS%20Support"
-                      startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                  }
-              }
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="8dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Delay (1-50s): "
+                        android:textStyle="bold" />
+                    <EditText
+                        android:id="@+id/etDelay"
+                        android:layout_width="80dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:text="5"
+                        android:gravity="center" />
+                </LinearLayout>
 
-              private fun checkPermissions() {
-                  val perms = arrayOf(
-                      Manifest.permission.SEND_SMS,
-                      Manifest.permission.RECEIVE_SMS,
-                      Manifest.permission.READ_SMS,
-                      Manifest.permission.READ_PHONE_STATE
-                  )
-                  if (perms.any { ActivityCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }) {
-                      ActivityCompat.requestPermissions(this, perms, 101)
-                  } else {
-                      loadSims()
-                  }
-              }
+                <EditText
+                    android:id="@+id/etCnics"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:hint="Enter CNIC numbers (one per line)"
+                    android:inputType="textMultiLine"
+                    android:gravity="top|start"
+                    android:background="#FFFFFF"
+                    android:padding="10dp" />
 
-              override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-                  super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-                  loadSims()
-              }
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp">
+                    <Button
+                        android:id="@+id/btnStart"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Start Sending"
+                        android:backgroundTint="#00695C"
+                        android:textColor="#FFFFFF" />
+                    <Button
+                        android:id="@+id/btnStop"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="Stop"
+                        android:backgroundTint="#C62828"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
 
-              private fun loadSims() {
-                  if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                      val sm = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-                      subList = sm.activeSubscriptionInfoList ?: emptyList()
-                      val simNames = if (subList.isEmpty()) listOf("Default SIM") else subList.map { "SIM ${it.simSlotIndex + 1} (${it.carrierName})" }
-                      simSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, simNames)
-                  }
-              }
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Status: Ready"
+                    android:textStyle="bold"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="6dp" />
 
-              private fun startSending() {
-                  val raw = cnicInput.text.toString().trim()
-                  if (raw.isEmpty()) {
-                      Toast.makeText(this, "Pehle CNIC numbers likhain", Toast.LENGTH_SHORT).show()
-                      return
-                  }
-                  cnicList = raw.lines().map { it.trim() }.filter { it.isNotEmpty() }
-                  val delaySec = (delayInput.text.toString().toIntOrNull() ?: 5).coerceIn(1, 50)
-                  currentIndex = 0
-                  isRunning = true
-                  resultText.text = ""
-                  sendNext(delaySec * 1000L)
-              }
+                <TextView
+                    android:id="@+id/tvResults"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:background="#FFFFFF"
+                    android:padding="10dp"
+                    android:text="668 Replies will appear here...\n"
+                    android:textIsSelectable="true" />
 
-              private fun sendNext(delayMillis: Long) {
-                  if (!isRunning || currentIndex >= cnicList.size) {
-                      isRunning = false
-                      statusText.text = "Status: Mukammal (${cnicList.size} sent)"
-                      return
-                  }
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp">
+                    <Button
+                        android:id="@+id/btnCopy"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Copy Data" />
+                    <Button
+                        android:id="@+id/btnWhatsApp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="WhatsApp Help"
+                        android:backgroundTint="#2E7D32"
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+        EOF
 
-                  val cnic = cnicList[currentIndex]
-                  lastSentCnic = cnic
-                  statusText.text = "Sending (${currentIndex + 1}/${cnicList.size}): $cnic"
+        cat << 'EOF' > app/src/main/java/com/aks/sms/MainActivity.kt
+        package com.aks.sms
 
-                  try {
-                      val smsManager = if (subList.isNotEmpty() && simSpinner.selectedItemPosition < subList.size) {
-                          val subId = subList[simSpinner.selectedItemPosition].subscriptionId
-                          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                              getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
-                          } else {
-                              @Suppress("DEPRECATION")
-                              SmsManager.getSmsManagerForSubscriptionId(subId)
-                          }
-                      } else {
-                          @Suppress("DEPRECATION")
-                          SmsManager.getDefault()
-                      }
-                      smsManager.sendTextMessage("668", null, cnic, null, null)
-                  } catch (e: Exception) {
-                      resultText.append("Error sending $cnic: ${e.message}\\n")
-                  }
+        import android.Manifest
+        import android.content.*
+        import android.content.pm.PackageManager
+        import android.net.Uri
+        import android.os.*
+        import android.provider.Telephony
+        import android.telephony.SmsManager
+        import android.telephony.SubscriptionManager
+        import android.widget.*
+        import androidx.appcompat.app.AppCompatActivity
+        import androidx.core.app.ActivityCompat
+        import androidx.core.content.ContextCompat
 
-                  currentIndex++
-                  handler.postDelayed({ sendNext(delayMillis) }, delayMillis)
-              }
+        class MainActivity : AppCompatActivity() {
 
-              override fun onResume() {
-                  super.onResume()
-                  val filter = IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                      registerReceiver(smsReceiver, filter, RECEIVER_EXPORTED)
-                  } else {
-                      registerReceiver(smsReceiver, filter)
-                  }
-              }
+            private var isRunning = false
+            private val handler = Handler(Looper.getMainLooper())
+            private lateinit var tvStatus: TextView
+            private lateinit var tvResults: TextView
+            private var lastSentCnic = ""
 
-              override fun onPause() {
-                  super.onPause()
-                  unregisterReceiver(smsReceiver)
-              }
-          }
-          '''
-          }
+            private val smsReceiver = object : BroadcastReceiver() {
+                override fun onReceive(context: Context?, intent: Intent?) {
+                    if (intent?.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
+                        val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+                        for (msg in messages) {
+                            val sender = msg.originatingAddress ?: ""
+                            if (sender.contains("668")) {
+                                val body = msg.messageBody ?: ""
+                                val entry = "CNIC: $lastSentCnic\nReply: $body\n----------------\n"
+                                tvResults.append(entry)
+                            }
+                        }
+                    }
+                }
+            }
 
-          for path, content in files.items():
-              lines = [l[10:] if l.startswith("          ") else l for l in content.splitlines()]
-              with open(path, "w") as f:
-                  f.write("\n".join(lines).lstrip() + "\n")
-          PYEOF
+            override fun onCreate(savedInstanceState: Bundle?) {
+                super.onCreate(savedInstanceState)
+                setContentView(R.layout.activity_main)
 
-      - name: Build APK
-        run: |
-          gradle wrapper --gradle-version 8.5
-          chmod +x gradlew
-          ./gradlew assembleDebug
+                val rbSim1 = findViewById<RadioButton>(R.id.rbSim1)
+                val etDelay = findViewById<EditText>(R.id.etDelay)
+                val etCnics = findViewById<EditText>(R.id.etCnics)
+                val btnStart = findViewById<Button>(R.id.btnStart)
+                val btnStop = findViewById<Button>(R.id.btnStop)
+                val btnCopy = findViewById<Button>(R.id.btnCopy)
+                val btnWhatsApp = findViewById<Button>(R.id.btnWhatsApp)
+                tvStatus = findViewById(R.id.tvStatus)
+                tvResults = findViewById(R.id.tvResults)
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: AKS-SMS-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+                checkPermissions()
+                registerReceiver(smsReceiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
+
+                btnStart.setOnClickListener {
+                    if (!checkPermissions()) return@setOnClickListener
+                    val list = etCnics.text.toString().lines().map { it.trim() }.filter { it.isNotEmpty() }
+                    if (list.isEmpty()) {
+                        Toast.makeText(this, "Enter at least 1 CNIC", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    val delaySec = (etDelay.text.toString().toIntOrNull() ?: 5).coerceIn(1, 50)
+                    val simSlot = if (rbSim1.isChecked) 0 else 1
+                    isRunning = true
+                    sendNext(list, 0, delaySec, simSlot)
+                }
+
+                btnStop.setOnClickListener {
+                    isRunning = false
+                    handler.removeCallbacksAndMessages(null)
+                    tvStatus.text = "Status: Stopped"
+                }
+
+                btnCopy.setOnClickListener {
+                    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText("AKS SMS Data", tvResults.text.toString()))
+                    Toast.makeText(this, "Data Copied!", Toast.LENGTH_SHORT).show()
+                }
+
+                btnWhatsApp.setOnClickListener {
+                    val url = "https://wa.me/923333997576"
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                }
+            }
+
+            private fun sendNext(list: List<String>, index: Int, delaySec: Int, simSlot: Int) {
+                if (!isRunning || index >= list.size) {
+                    isRunning = false
+                    tvStatus.text = "Status: Completed"
+                    return
+                }
+                val cnic = list[index]
+                lastSentCnic = cnic
+                tvStatus.text = "Sending (${index + 1}/${list.size}): $cnic"
+                sendSmsViaSim(cnic, simSlot)
+
+                handler.postDelayed({
+                    sendNext(list, index + 1, delaySec, simSlot)
+                }, delaySec * 1000L)
+            }
+
+            private fun sendSmsViaSim(text: String, simSlot: Int) {
+                try {
+                    val subManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                        val subList = subManager.activeSubscriptionInfoList
+                        val subId = if (!subList.isNullOrEmpty() && simSlot < subList.size) {
+                            subList[simSlot].subscriptionId
+                        } else {
+                            SmsManager.getDefaultSmsSubscriptionId()
+                        }
+                        val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
+                        } else {
+                            @Suppress("DEPRECATION")
+                            SmsManager.getSmsManagerForSubscriptionId(subId)
+                        }
+                        smsManager.sendTextMessage("668", null, text, null, null)
+                    }
+                } catch (e: Exception) {
+                    tvStatus.text = "Error: ${e.message}"
+                }
+            }
+
+            private fun checkPermissions(): Boolean {
+                val perms = arrayOf(
+                    Manifest.permission.SEND_SMS,
+                    Manifest.permission.RECEIVE_SMS,
+                    Manifest.permission.READ_SMS,
+                    Manifest.permission.READ_PHONE_STATE
+                )
+                val needed = perms.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+                return if (needed.isNotEmpty()) {
+                    ActivityCompat.requestPermissions(this, needed.toTypedArray(), 101)
+                    false
+                } else true
+            }
+
+            override fun onDestroy() {
+                super.onDestroy()
+                unregisterReceiver(smsReceiver)
+            }
+        }
+        EOF
+
+    - name: Build Debug APK
+      run: gradle assembleDebug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: AKS-SMS-APK
+        path: app/build/outputs/apk/debug/app-debug.apk

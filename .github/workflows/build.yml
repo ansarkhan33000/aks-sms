@@ -1,338 +1,899 @@
-package com.aks.app
+name: Build AKS Call 3D APK
 
-import android.app.Activity
-import android.os.Bundle
-import android.content.Intent
-import android.graphics.Color
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
-import android.media.ToneGenerator
-import android.media.AudioManager
-import android.net.Uri
-import android.view.Gravity
-import android.view.View
-import android.view.animation.LinearInterpolator
-import android.animation.ObjectAnimator
-import android.widget.*
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
 
-class MainActivity : Activity() {
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-    private val gold = Color.rgb(230, 180, 65)
-    private val dark = Color.rgb(10, 15, 29)
-    private val white = Color.WHITE
-    private val whatsapp = "92333997576"
+    steps:
+    - uses: actions/checkout@v4
 
-    private val sound = ToneGenerator(
-        AudioManager.STREAM_MUSIC, 90
-    )
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        showLogin()
-    }
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.4'
 
-    private fun playLogin() {
-        sound.startTone(ToneGenerator.TONE_PROP_BEEP, 180)
-    }
+    - name: Generate AKS Call 3D Project
+      run: |
+        mkdir -p app/src/main/java/com/aks/call app/src/main/res/layout app/src/main/res/drawable app/src/main/res/xml
 
-    private fun playSuccess() {
-        sound.startTone(ToneGenerator.TONE_PROP_ACK, 300)
-    }
-
-    private fun playError() {
-        sound.startTone(ToneGenerator.TONE_PROP_NACK, 350)
-    }
-
-    private fun playButton() {
-        sound.startTone(ToneGenerator.TONE_PROP_BEEP, 90)
-    }
-
-    private fun background(): GradientDrawable {
-        return GradientDrawable(
-            GradientDrawable.Orientation.TL_BR,
-            intArrayOf(
-                Color.rgb(7, 12, 25),
-                Color.rgb(30, 37, 59),
-                Color.rgb(7, 12, 25)
-            )
-        )
-    }
-
-    private fun round(color: Int): GradientDrawable {
-        return GradientDrawable().apply {
-            setColor(color)
-            cornerRadius = 25f
+        cat << 'EOF' > settings.gradle.kts
+        pluginManagement {
+          repositories { google(); mavenCentral(); gradlePluginPortal() }
         }
-    }
-
-    private fun makeText(
-        value: String,
-        size: Float,
-        color: Int
-    ): TextView {
-        return TextView(this).apply {
-            text = value
-            textSize = size
-            setTextColor(color)
-            gravity = Gravity.CENTER
+        dependencyResolutionManagement {
+          repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+          repositories { google(); mavenCentral() }
         }
-    }
+        rootProject.name = "AKS_Call"
+        include(":app")
+        EOF
 
-    private fun makeButton(value: String): Button {
-        return Button(this).apply {
-            text = value
-            textSize = 16f
-            isAllCaps = false
-            setTextColor(Color.BLACK)
-            background = round(gold)
-            elevation = 10f
+        cat << 'EOF' > build.gradle.kts
+        plugins {
+          id("com.android.application") version "8.2.2" apply false
+          id("org.jetbrains.kotlin.android") version "1.9.22" apply false
         }
-    }
+        EOF
 
-    private fun createRoot(): LinearLayout {
-        return LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(25, 25, 25, 25)
-            background = background()
+        cat << 'EOF' > gradle.properties
+        org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+        android.useAndroidX=true
+        kotlin.code.style=official
+        EOF
+
+        cat << 'EOF' > app/build.gradle.kts
+        plugins {
+          id("com.android.application")
+          id("org.jetbrains.kotlin.android")
         }
-    }
+        android {
+          namespace = "com.aks.call"
+          compileSdk = 34
+          defaultConfig {
+            applicationId = "com.aks.call"
+            minSdk = 24
+            targetSdk = 34
+            versionCode = 1
+            versionName = "1.0"
+          }
+          buildTypes {
+            release { isMinifyEnabled = false }
+          }
+          compileOptions {
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
+          }
+          kotlinOptions { jvmTarget = "17" }
+        }
+        dependencies {
+          implementation("androidx.core:core-ktx:1.12.0")
+          implementation("androidx.appcompat:appcompat:1.6.1")
+          implementation("com.google.android.material:material:1.11.0")
+        }
+        EOF
 
-    private fun addLogo(root: LinearLayout) {
+        cat << 'EOF' > app/src/main/res/xml/accessibility_service_config.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+          android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+          android:accessibilityFeedbackType="feedbackGeneric"
+          android:accessibilityFlags="flagDefault|flagRetrieveInteractiveWindows"
+          android:canRetrieveWindowContent="true"
+          android:description="@string/acc_desc"
+          android:notificationTimeout="100" />
+        EOF
 
-        val logo = TextView(this).apply {
-            text = "A K S"
-            textSize = 48f
-            setTextColor(gold)
-            gravity = Gravity.CENTER
-            typeface = Typeface.create(
-                "sans-serif-black",
-                Typeface.BOLD
-            )
-            elevation = 20f
-            background = GradientDrawable(
-                GradientDrawable.Orientation.TL_BR,
-                intArrayOf(
-                    Color.rgb(100, 72, 20),
-                    Color.rgb(20, 25, 40)
-                )
-            ).apply {
-                cornerRadius = 100f
-                setStroke(4, gold)
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_header.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+          <item android:top="6dp">
+            <shape android:shape="rectangle">
+              <solid android:color="#0D1B2A" />
+              <corners android:radius="24dp" />
+            </shape>
+          </item>
+          <item android:bottom="6dp">
+            <shape android:shape="rectangle">
+              <gradient
+                android:startColor="#004D40"
+                android:centerColor="#00796B"
+                android:endColor="#26A69A"
+                android:angle="135" />
+              <corners android:radius="24dp" />
+              <stroke android:width="2dp" android:color="#80CBC4" />
+            </shape>
+          </item>
+        </layer-list>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_card.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+          <item android:top="5dp" android:left="2dp" android:right="2dp">
+            <shape android:shape="rectangle">
+              <solid android:color="#90A4AE" />
+              <corners android:radius="20dp" />
+            </shape>
+          </item>
+          <item android:bottom="5dp">
+            <shape android:shape="rectangle">
+              <gradient
+                android:startColor="#FFFFFF"
+                android:endColor="#ECEFF1"
+                android:angle="270" />
+              <corners android:radius="20dp" />
+              <stroke android:width="1.5dp" android:color="#CFD8DC" />
+            </shape>
+          </item>
+        </layer-list>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_btn_start.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+          <item android:top="6dp">
+            <shape android:shape="rectangle">
+              <solid android:color="#00251A" />
+              <corners android:radius="18dp" />
+            </shape>
+          </item>
+          <item android:bottom="6dp">
+            <shape android:shape="rectangle">
+              <gradient
+                android:startColor="#00BFA5"
+                android:centerColor="#00897B"
+                android:endColor="#004D40"
+                android:angle="270" />
+              <corners android:radius="18dp" />
+              <stroke android:width="2dp" android:color="#A7FFEB" />
+            </shape>
+          </item>
+        </layer-list>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_btn_perm.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+          <item android:top="4dp">
+            <shape android:shape="rectangle">
+              <solid android:color="#BF360C" />
+              <corners android:radius="16dp" />
+            </shape>
+          </item>
+          <item android:bottom="4dp">
+            <shape android:shape="rectangle">
+              <gradient
+                android:startColor="#FF7043"
+                android:endColor="#E64A19"
+                android:angle="270" />
+              <corners android:radius="16dp" />
+              <stroke android:width="1.5dp" android:color="#FFCCBC" />
+            </shape>
+          </item>
+        </layer-list>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_btn_whatsapp.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+          <item android:top="5dp">
+            <shape android:shape="rectangle">
+              <solid android:color="#1B5E20" />
+              <corners android:radius="16dp" />
+            </shape>
+          </item>
+          <item android:bottom="5dp">
+            <shape android:shape="rectangle">
+              <gradient
+                android:startColor="#43A047"
+                android:endColor="#2E7D32"
+                android:angle="270" />
+              <corners android:radius="16dp" />
+              <stroke android:width="1.5dp" android:color="#B9F6CA" />
+            </shape>
+          </item>
+        </layer-list>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/ic_aks_call_logo.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+          android:width="108dp"
+          android:height="108dp"
+          android:viewportWidth="108"
+          android:viewportHeight="108">
+          <path android:fillColor="#00251A" android:pathData="M14,14 L94,14 Q102,14 102,22 L102,94 Q102,102 94,102 L14,102 Q6,102 6,94 L6,22 Q6,14 14,14 Z" />
+          <path android:fillColor="#004D40" android:pathData="M14,8 L94,8 Q102,8 102,16 L102,88 Q102,96 94,96 L14,96 Q6,96 6,88 L6,16 Q6,8 14,8 Z" />
+          <path android:fillColor="#00897B" android:pathData="M20,18 L52,18 L64,30 L64,74 Q64,78 60,78 L20,78 Q16,78 16,74 L16,22 Q16,18 20,18 Z" />
+          <path android:fillColor="#FFFFFF" android:pathData="M42,26 L74,26 L88,40 L88,84 Q88,88 84,88 L42,88 Q38,88 38,84 L38,30 Q38,26 42,26 Z" />
+          <path android:fillColor="#FBC02D" android:pathData="M48,48 L76,48 Q79,48 79,51 L79,75 Q79,78 76,78 L48,78 Q45,78 45,75 L45,51 Q45,48 48,48 Z" />
+          <path android:fillColor="#E65100" android:pathData="M56,48 L58,48 L58,78 L56,78 Z" />
+          <path android:fillColor="#E65100" android:pathData="M66,48 L68,48 L68,78 L66,78 Z" />
+          <path android:fillColor="#E65100" android:pathData="M45,62 L79,62 L79,64 L45,64 Z" />
+        </vector>
+        EOF
+
+        cat << 'EOF' > app/src/main/AndroidManifest.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+          <uses-permission android:name="android.permission.CALL_PHONE" />
+          <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+          <uses-permission android:name="android.permission.SEND_SMS" />
+          <application
+            android:allowBackup="true"
+            android:icon="@drawable/ic_aks_call_logo"
+            android:roundIcon="@drawable/ic_aks_call_logo"
+            android:label="AKS Call"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
+            <activity android:name=".MainActivity" android:exported="true">
+              <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+              </intent-filter>
+            </activity>
+            <service
+              android:name=".UssdReaderService"
+              android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+              android:exported="true">
+              <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+              </intent-filter>
+              <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+            </service>
+          </application>
+          <string name="acc_desc">AKS Call Auto CNIC Reader &amp; SMS Sender</string>
+        </manifest>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/layout/activity_main.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:background="#DCE3EB">
+
+          <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <!-- 3D Header -->
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/bg_3d_header"
+              android:elevation="12dp"
+              android:gravity="center"
+              android:orientation="vertical"
+              android:padding="16dp"
+              android:layout_marginBottom="14dp">
+
+              <ImageView
+                android:layout_width="68dp"
+                android:layout_height="68dp"
+                android:src="@drawable/ic_aks_call_logo"
+                android:contentDescription="AKS Call Logo" />
+
+              <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AKS Call"
+                android:textColor="#FFFFFF"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:shadowColor="#00251A"
+                android:shadowDx="2"
+                android:shadowDy="3"
+                android:shadowRadius="4"
+                android:paddingTop="4dp" />
+
+              <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3D HD Auto Dialer (*336*1*2#) &amp; Auto SMS"
+                android:textColor="#B2DFDB"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Accessibility Service Activation Card -->
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/bg_3d_card"
+              android:elevation="8dp"
+              android:orientation="vertical"
+              android:padding="14dp"
+              android:layout_marginBottom="14dp">
+
+              <TextView
+                android:id="@+id/tvServiceStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Auto Reader Service: OFF (Tap below to Turn ON)"
+                android:textColor="#C62828"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:paddingBottom="8dp" />
+
+              <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnEnableService"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_3d_btn_perm"
+                android:text="Enable AKS Call Screen Reader"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- 3D SIM & KMA Settings Card -->
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/bg_3d_card"
+              android:elevation="8dp"
+              android:orientation="vertical"
+              android:padding="14dp"
+              android:layout_marginBottom="14dp">
+
+              <RadioGroup
+                android:id="@+id/simGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingBottom="8dp">
+                <RadioButton
+                  android:id="@+id/rbSim1"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="SIM 1"
+                  android:textSize="16sp"
+                  android:textStyle="bold"
+                  android:textColor="#004D40"
+                  android:checked="true"
+                  android:layout_marginEnd="36dp" />
+                <RadioButton
+                  android:id="@+id/rbSim2"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="SIM 2"
+                  android:textSize="16sp"
+                  android:textStyle="bold"
+                  android:textColor="#004D40" />
+              </RadioGroup>
+
+              <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Send To Number: "
+                  android:textStyle="bold"
+                  android:textColor="#263238" />
+                <EditText
+                  android:id="@+id/etRecipient"
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:inputType="number"
+                  android:text="9771"
+                  android:textStyle="bold"
+                  android:textColor="#004D40"
+                  android:gravity="center" />
+              </LinearLayout>
+
+              <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Message Format ({CNIC} &amp; {CODE} auto replace):"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#37474F"
+                android:paddingBottom="4dp" />
+
+              <EditText
+                android:id="@+id/etFormat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#F5F7FA"
+                android:padding="10dp"
+                android:text="REG {CNIC} KMA{CODE} S 03102018"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#004D40"
+                android:layout_marginBottom="10dp" />
+
+              <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="#F5F7FA"
+                android:padding="8dp">
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Next KMA Code: "
+                  android:textSize="15sp"
+                  android:textStyle="bold"
+                  android:textColor="#263238" />
+                <EditText
+                  android:id="@+id/etKmaCode"
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:inputType="number"
+                  android:text="9801"
+                  android:textSize="18sp"
+                  android:textStyle="bold"
+                  android:textColor="#00695C"
+                  android:gravity="center" />
+                <Button
+                  android:id="@+id/btnSaveSettings"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Save"
+                  android:backgroundTint="#00695C"
+                  android:textColor="#FFFFFF" />
+              </LinearLayout>
+            </LinearLayout>
+
+            <!-- 3D Start Button -->
+            <androidx.appcompat.widget.AppCompatButton
+              android:id="@+id/btnStart"
+              android:layout_width="match_parent"
+              android:layout_height="70dp"
+              android:background="@drawable/bg_3d_btn_start"
+              android:elevation="12dp"
+              android:text="START DIAL (*336*1*2#) -> SMS"
+              android:textColor="#FFFFFF"
+              android:textSize="18sp"
+              android:textStyle="bold"
+              android:shadowColor="#00251A"
+              android:shadowDx="2"
+              android:shadowDy="2"
+              android:shadowRadius="3"
+              android:layout_marginBottom="14dp" />
+
+            <!-- 3D Report & Status Card -->
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/bg_3d_card"
+              android:elevation="8dp"
+              android:orientation="vertical"
+              android:padding="14dp"
+              android:layout_marginBottom="14dp">
+
+              <TextView
+                android:id="@+id/tvLastAction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Last Captured: None"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:background="#E8F5E9"
+                android:padding="10dp"
+                android:textIsSelectable="true" />
+
+              <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Complete Activity Report:"
+                android:textStyle="bold"
+                android:textColor="#263238"
+                android:paddingTop="10dp"
+                android:paddingBottom="4dp" />
+
+              <TextView
+                android:id="@+id/tvReport"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#F5F7FA"
+                android:padding="10dp"
+                android:text="Waiting for dial...\n"
+                android:textSize="12sp"
+                android:textColor="#263238"
+                android:textIsSelectable="true" />
+
+              <Button
+                android:id="@+id/btnCopyReport"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="8dp"
+                android:text="Copy Report"
+                android:backgroundTint="#37474F"
+                android:textColor="#FFFFFF" />
+            </LinearLayout>
+
+            <!-- 3D WhatsApp Contact -->
+            <androidx.appcompat.widget.AppCompatButton
+              android:id="@+id/btnWhatsApp"
+              android:layout_width="match_parent"
+              android:layout_height="60dp"
+              android:background="@drawable/bg_3d_btn_whatsapp"
+              android:elevation="10dp"
+              android:text="WhatsApp Support: 03333997576"
+              android:textColor="#FFFFFF"
+              android:textSize="16sp"
+              android:textStyle="bold" />
+
+          </LinearLayout>
+        </ScrollView>
+        EOF
+
+        cat << 'EOF' > app/src/main/java/com/aks/call/UssdReaderService.kt
+        package com.aks.call
+
+        import android.accessibilityservice.AccessibilityService
+        import android.content.*
+        import android.media.AudioManager
+        import android.media.ToneGenerator
+        import android.net.Uri
+        import android.os.Build
+        import android.provider.Telephony
+        import android.telephony.SmsManager
+        import android.telephony.SubscriptionManager
+        import android.view.accessibility.AccessibilityEvent
+        import android.view.accessibility.AccessibilityNodeInfo
+        import android.widget.Toast
+        import java.text.SimpleDateFormat
+        import java.util.*
+
+        class UssdReaderService : AccessibilityService() {
+
+          override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+            val prefs = getSharedPreferences("AKS_CALL_PREFS", Context.MODE_PRIVATE)
+            val isWaiting = prefs.getBoolean("waiting_for_ussd", false)
+            if (!isWaiting) return
+
+            val rootNode = rootInActiveWindow ?: return
+            val allText = StringBuilder()
+            collectText(rootNode, allText)
+            val screenText = allText.toString()
+
+            val cleanDigits = screenText.replace("-", "")
+            val match = Regex("\\b\\d{13}\\b").find(cleanDigits)
+
+            if (match != null) {
+              val cnic = match.value
+              prefs.edit().putBoolean("waiting_for_ussd", false).apply()
+
+              // Copy CNIC to clipboard
+              val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+              clipboard.setPrimaryClip(ClipData.newPlainText("CNIC", cnic))
+
+              // Close USSD popup dialog automatically
+              clickDismissButton(rootNode)
+
+              // Format SMS & increment KMA code
+              val currentCode = prefs.getInt("kma_code", 9801)
+              val format = prefs.getString("sms_format", "REG {CNIC} KMA{CODE} S 03102018") ?: "REG {CNIC} KMA{CODE} S 03102018"
+              val recipient = prefs.getString("recipient_num", "9771") ?: "9771"
+              val simSlot = prefs.getInt("selected_sim", 0)
+
+              val finalSms = format
+                .replace("{CNIC}", cnic)
+                .replace("{CODE}", currentCode.toString())
+
+              val nextCode = currentCode + 1
+              val timeStr = SimpleDateFormat("dd-MM HH:mm:ss", Locale.getDefault()).format(Date())
+              val newEntry = "[$timeStr] SIM${simSlot + 1} | KMA$currentCode\nCNIC: $cnic\nMsg ($recipient): $finalSms\n-------------------------\n"
+              val oldReport = prefs.getString("full_report", "") ?: ""
+
+              prefs.edit()
+                .putInt("kma_code", nextCode)
+                .putString("last_captured", "CNIC: $cnic -> $finalSms")
+                .putString("full_report", newEntry + oldReport)
+                .apply()
+
+              try {
+                ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100).startTone(ToneGenerator.TONE_PROP_ACK, 350)
+              } catch (_: Exception) {}
+
+              Toast.makeText(this, "CNIC Copied: $cnic", Toast.LENGTH_SHORT).show()
+
+              // Try direct SMS send and also open New Message composer with pre-filled text
+              sendDirectSms(recipient, finalSms, simSlot)
+              openSmsComposer(recipient, finalSms)
             }
-        }
+          }
 
-        root.addView(
-            logo,
-            LinearLayout.LayoutParams(240, 130)
-        )
-
-        ObjectAnimator.ofFloat(
-            logo,
-            View.ROTATION_Y,
-            0f,
-            360f
-        ).apply {
-            duration = 4000
-            repeatCount = ObjectAnimator.INFINITE
-            interpolator = LinearInterpolator()
-            start()
-        }
-
-        ObjectAnimator.ofFloat(
-            logo,
-            View.SCALE_X,
-            1f, 1.08f, 1f
-        ).apply {
-            duration = 2200
-            repeatCount = ObjectAnimator.INFINITE
-            start()
-        }
-    }
-
-    private fun showLogin() {
-
-        val root = createRoot()
-
-        addLogo(root)
-
-        root.addView(
-            makeText("WELCOME TO AKS", 24f, white)
-        )
-
-        root.addView(
-            makeText("PREMIUM APPLICATION", 14f, gold)
-        )
-
-        val username = EditText(this).apply {
-            hint = "Enter Username"
-            setHintTextColor(Color.LTGRAY)
-            setTextColor(white)
-            singleLine = true
-            background = round(Color.rgb(43, 50, 68))
-            setPadding(20, 10, 20, 10)
-        }
-
-        val password = EditText(this).apply {
-            hint = "Enter Password"
-            setHintTextColor(Color.LTGRAY)
-            setTextColor(white)
-            inputType = 129
-            singleLine = true
-            background = round(Color.rgb(43, 50, 68))
-            setPadding(20, 10, 20, 10)
-        }
-
-        root.addView(
-            username,
-            LinearLayout.LayoutParams(-1, 60).apply {
-                topMargin = 35
-                bottomMargin = 15
+          private fun collectText(node: AccessibilityNodeInfo?, sb: StringBuilder) {
+            if (node == null) return
+            if (node.text != null) {
+              sb.append(node.text).append(" ")
             }
-        )
-
-        root.addView(
-            password,
-            LinearLayout.LayoutParams(-1, 60).apply {
-                bottomMargin = 20
+            for (i in 0 until node.childCount) {
+              collectText(node.getChild(i), sb)
             }
-        )
+          }
 
-        val status = makeText(
-            "Please Login",
-            14f,
-            white
-        )
-
-        root.addView(status)
-
-        val login = makeButton("LOGIN")
-
-        root.addView(
-            login,
-            LinearLayout.LayoutParams(-1, 60).apply {
-                topMargin = 15
+          private fun clickDismissButton(node: AccessibilityNodeInfo?) {
+            if (node == null) return
+            val labels = listOf("OK", "Cancel", "Dismiss", "Close", "ٹھیک ہے")
+            for (label in labels) {
+              val nodes = node.findAccessibilityNodeInfosByText(label)
+              for (n in nodes) {
+                if (n.isClickable) {
+                  n.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                  return
+                }
+              }
             }
-        )
+          }
 
-        login.setOnClickListener {
+          private fun sendDirectSms(recipient: String, message: String, simSlot: Int) {
+            try {
+              val subManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+              val subList = subManager.activeSubscriptionInfoList
+              val subId = if (!subList.isNullOrEmpty() && simSlot < subList.size) {
+                subList[simSlot].subscriptionId
+              } else {
+                SubscriptionManager.getDefaultSmsSubscriptionId()
+              }
+              val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
+              } else {
+                @Suppress("DEPRECATION")
+                SmsManager.getSmsManagerForSubscriptionId(subId)
+              }
+              smsManager.sendTextMessage(recipient, null, message, null, null)
+            } catch (_: Exception) {}
+          }
 
-            playLogin()
+          private fun openSmsComposer(recipient: String, message: String) {
+            try {
+              val defaultSmsPkg = Telephony.Sms.getDefaultSmsPackage(this)
+              val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:$recipient")).apply {
+                putExtra("sms_body", message)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                if (defaultSmsPkg != null) setPackage(defaultSmsPkg)
+              }
+              startActivity(intent)
+            } catch (_: Exception) {}
+          }
 
-            if (
-                username.text.toString().isBlank() ||
-                password.text.toString().length < 4
-            ) {
-                playError()
-                status.text = "Login Error! Check your details"
-                status.setTextColor(Color.RED)
+          override fun onInterrupt() {}
+        }
+        EOF
 
+        cat << 'EOF' > app/src/main/java/com/aks/call/MainActivity.kt
+        package com.aks.call
+
+        import android.Manifest
+        import android.content.*
+        import android.content.pm.PackageManager
+        import android.media.AudioManager
+        import android.media.ToneGenerator
+        import android.net.Uri
+        import android.os.Bundle
+        import android.provider.Settings
+        import android.telecom.PhoneAccountHandle
+        import android.telecom.TelecomManager
+        import android.text.TextUtils
+        import android.view.SoundEffectConstants
+        import android.widget.*
+        import androidx.appcompat.app.AppCompatActivity
+        import androidx.core.app.ActivityCompat
+        import androidx.core.content.ContextCompat
+
+        class MainActivity : AppCompatActivity() {
+
+          private lateinit var tvServiceStatus: TextView
+          private lateinit var tvLastAction: TextView
+          private lateinit var tvReport: TextView
+          private lateinit var etKmaCode: EditText
+          private lateinit var etFormat: EditText
+          private lateinit var etRecipient: EditText
+          private lateinit var prefs: SharedPreferences
+          private var toneGen: ToneGenerator? = null
+
+          override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.activity_main)
+
+            try {
+              toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 95)
+            } catch (_: Exception) {}
+
+            prefs = getSharedPreferences("AKS_CALL_PREFS", Context.MODE_PRIVATE)
+            val rbSim1 = findViewById<RadioButton>(R.id.rbSim1)
+            val btnEnableService = findViewById<Button>(R.id.btnEnableService)
+            val btnSaveSettings = findViewById<Button>(R.id.btnSaveSettings)
+            val btnStart = findViewById<Button>(R.id.btnStart)
+            val btnCopyReport = findViewById<Button>(R.id.btnCopyReport)
+            val btnWhatsApp = findViewById<Button>(R.id.btnWhatsApp)
+
+            tvServiceStatus = findViewById(R.id.tvServiceStatus)
+            tvLastAction = findViewById(R.id.tvLastAction)
+            tvReport = findViewById(R.id.tvReport)
+            etKmaCode = findViewById(R.id.etKmaCode)
+            etFormat = findViewById(R.id.etFormat)
+            etRecipient = findViewById(R.id.etRecipient)
+
+            checkPermissions()
+
+            btnEnableService.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              playBeep()
+              startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+              Toast.makeText(this, "Find 'AKS Call' and Turn ON", Toast.LENGTH_LONG).show()
+            }
+
+            btnSaveSettings.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              val code = etKmaCode.text.toString().toIntOrNull() ?: 9801
+              val fmt = etFormat.text.toString().trim().ifEmpty { "REG {CNIC} KMA{CODE} S 03102018" }
+              val rec = etRecipient.text.toString().trim().ifEmpty { "9771" }
+              prefs.edit()
+                .putInt("kma_code", code)
+                .putString("sms_format", fmt)
+                .putString("recipient_num", rec)
+                .apply()
+              playAck()
+              Toast.makeText(this, "Saved! Next: KMA$code -> $rec", Toast.LENGTH_SHORT).show()
+            }
+
+            btnStart.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              playBeep()
+              if (!checkPermissions()) return@setOnClickListener
+
+              if (!isAccessibilityEnabled()) {
+                Toast.makeText(this, "Please Enable 'AKS Call Screen Reader' first!", Toast.LENGTH_LONG).show()
+                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                return@setOnClickListener
+              }
+
+              val simSlot = if (rbSim1.isChecked) 0 else 1
+              val code = etKmaCode.text.toString().toIntOrNull() ?: prefs.getInt("kma_code", 9801)
+              val fmt = etFormat.text.toString().trim().ifEmpty { "REG {CNIC} KMA{CODE} S 03102018" }
+              val rec = etRecipient.text.toString().trim().ifEmpty { "9771" }
+
+              prefs.edit()
+                .putBoolean("waiting_for_ussd", true)
+                .putInt("selected_sim", simSlot)
+                .putInt("kma_code", code)
+                .putString("sms_format", fmt)
+                .putString("recipient_num", rec)
+                .apply()
+
+              dialUssdInDialer("*336*1*2#", simSlot)
+            }
+
+            btnCopyReport.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+              clipboard.setPrimaryClip(ClipData.newPlainText("AKS_REPORT", tvReport.text.toString()))
+              playAck()
+              Toast.makeText(this, "Report Copied!", Toast.LENGTH_SHORT).show()
+            }
+
+            btnWhatsApp.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              playBeep()
+              try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
+              } catch (e: Exception) {
+                Toast.makeText(this, "WhatsApp: 03333997576", Toast.LENGTH_LONG).show()
+              }
+            }
+          }
+
+          override fun onResume() {
+            super.onResume()
+            refreshUi()
+          }
+
+          private fun refreshUi() {
+            val active = isAccessibilityEnabled()
+            if (active) {
+              tvServiceStatus.text = "Auto Reader Service: ON (Ready to Work)"
+              tvServiceStatus.setTextColor(0xFF1B5E20.toInt())
             } else {
-
-                playSuccess()
-
-                showDashboard(
-                    username.text.toString()
-                )
+              tvServiceStatus.text = "Auto Reader Service: OFF (Tap button below to ON)"
+              tvServiceStatus.setTextColor(0xFFC62828.toInt())
             }
-        }
 
-        val whatsApp = makeButton(
-            "CONTACT ON WHATSAPP"
-        )
+            etKmaCode.setText(prefs.getInt("kma_code", 9801).toString())
+            etFormat.setText(prefs.getString("sms_format", "REG {CNIC} KMA{CODE} S 03102018"))
+            etRecipient.setText(prefs.getString("recipient_num", "9771"))
+            tvLastAction.text = "Last Captured:\n" + (prefs.getString("last_captured", "None yet") ?: "None yet")
+            val rep = prefs.getString("full_report", "") ?: ""
+            if (rep.isNotEmpty()) tvReport.text = rep
+          }
 
-        root.addView(
-            whatsApp,
-            LinearLayout.LayoutParams(-1, 55).apply {
-                topMargin = 20
+          private fun dialUssdInDialer(ussd: String, simSlot: Int) {
+            try {
+              if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
+                  ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                checkPermissions()
+                return
+              }
+
+              val encodedUssd = ussd.replace("#", Uri.encode("#"))
+              val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$encodedUssd"))
+
+              val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+              val accounts: List<PhoneAccountHandle> = telecomManager.callCapablePhoneAccounts
+              if (accounts.isNotEmpty() && simSlot < accounts.size) {
+                callIntent.putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, accounts[simSlot])
+              }
+
+              startActivity(callIntent)
+            } catch (e: Exception) {
+              Toast.makeText(this, "Dial Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
-        )
+          }
 
-        whatsApp.setOnClickListener {
-            playButton()
-            openWhatsApp()
-        }
+          private fun isAccessibilityEnabled(): Boolean {
+            val expectedComponent = ComponentName(this, UssdReaderService::class.java).flattenToString()
+            val enabledServices = Settings.Secure.getString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
+            val splitter = TextUtils.SimpleStringSplitter(':')
+            splitter.setString(enabledServices)
+            while (splitter.hasNext()) {
+              if (splitter.next().equals(expectedComponent, ignoreCase = true)) return true
+            }
+            return false
+          }
 
-        setContentView(root)
-    }
-
-    private fun showDashboard(user: String) {
-
-        val root = createRoot()
-
-        addLogo(root)
-
-        root.addView(
-            makeText("AKS DASHBOARD", 26f, gold)
-        )
-
-        root.addView(
-            makeText("Welcome $user", 19f, white)
-        )
-
-        root.addView(
-            makeText(
-                "Your AKS application",
-                15f,
-                Color.LTGRAY
+          private fun checkPermissions(): Boolean {
+            val perms = arrayOf(
+              Manifest.permission.CALL_PHONE,
+              Manifest.permission.READ_PHONE_STATE,
+              Manifest.permission.SEND_SMS
             )
-        )
+            val needed = perms.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+            return if (needed.isNotEmpty()) {
+              ActivityCompat.requestPermissions(this, needed.toTypedArray(), 106)
+              false
+            } else true
+          }
 
-        val whatsApp = makeButton(
-            "WHATSAPP CONTACT"
-        )
+          private fun playBeep() {
+            try { toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP, 150) } catch (_: Exception) {}
+          }
 
-        root.addView(
-            whatsApp,
-            LinearLayout.LayoutParams(-1, 60).apply {
-                topMargin = 30
-            }
-        )
+          private fun playAck() {
+            try { toneGen?.startTone(ToneGenerator.TONE_PROP_ACK, 300) } catch (_: Exception) {}
+          }
 
-        whatsApp.setOnClickListener {
-            playButton()
-            openWhatsApp()
+          override fun onDestroy() {
+            super.onDestroy()
+            toneGen?.release()
+          }
         }
+        EOF
 
-        val logout = makeButton("LOGOUT")
+        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/xml/accessibility_service_config.xml app/src/main/res/drawable/bg_3d_header.xml app/src/main/res/drawable/bg_3d_card.xml app/src/main/res/drawable/bg_3d_btn_start.xml app/src/main/res/drawable/bg_3d_btn_perm.xml app/src/main/res/drawable/bg_3d_btn_whatsapp.xml app/src/main/res/drawable/ic_aks_call_logo.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/call/UssdReaderService.kt app/src/main/java/com/aks/call/MainActivity.kt
 
-        root.addView(
-            logout,
-            LinearLayout.LayoutParams(-1, 60).apply {
-                topMargin = 15
-            }
-        )
+    - name: Build Debug APK
+      run: gradle assembleDebug --no-daemon
 
-        logout.setOnClickListener {
-            playButton()
-            showLogin()
-        }
-
-        setContentView(root)
-    }
-
-    private fun openWhatsApp() {
-
-        val link = "https://wa.me/$whatsapp"
-
-        try {
-            val intent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(link)
-            )
-            startActivity(intent)
-
-        } catch (e: Exception) {
-            Toast.makeText(
-                this,
-                "WhatsApp not available",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        sound.release()
-    }
-}
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: AKS-Call-3D-APK
+        path: app/build/outputs/apk/debug/app-debug.apk

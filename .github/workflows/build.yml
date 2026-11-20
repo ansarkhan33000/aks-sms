@@ -1,4 +1,4 @@
-name: Build AKS SMS APK
+name: Build AKS CNIC 3D APK
 
 on:
   push:
@@ -23,9 +23,9 @@ jobs:
       with:
         gradle-version: '8.4'
 
-    - name: Generate Project Files
+    - name: Generate AKS CNIC 3D Project
       run: |
-        mkdir -p app/src/main/java/com/aks/sms app/src/main/res/layout
+        mkdir -p app/src/main/java/com/aks/cnic app/src/main/res/layout app/src/main/res/drawable
 
         cat << 'EOF' > settings.gradle.kts
         pluginManagement {
@@ -35,7 +35,7 @@ jobs:
           repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
           repositories { google(); mavenCentral() }
         }
-        rootProject.name = "AKS_SMS"
+        rootProject.name = "AKS_CNIC"
         include(":app")
         EOF
 
@@ -58,11 +58,11 @@ jobs:
           id("org.jetbrains.kotlin.android")
         }
         android {
-          namespace = "com.aks.sms"
+          namespace = "com.aks.cnic"
           compileSdk = 34
           defaultConfig {
-            applicationId = "com.aks.sms"
-            minSdk = 22
+            applicationId = "com.aks.cnic"
+            minSdk = 26
             targetSdk = 34
             versionCode = 1
             versionName = "1.0"
@@ -83,17 +83,112 @@ jobs:
         }
         EOF
 
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_header.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+          <gradient
+            android:startColor="#004D40"
+            android:centerColor="#00796B"
+            android:endColor="#26A69A"
+            android:angle="135" />
+          <corners android:radius="20dp" />
+          <stroke android:width="2dp" android:color="#80CBC4" />
+        </shape>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_card.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+          <item android:top="4dp" android:left="2dp" android:right="2dp">
+            <shape android:shape="rectangle">
+              <solid android:color="#B0BEC5" />
+              <corners android:radius="18dp" />
+            </shape>
+          </item>
+          <item android:bottom="4dp">
+            <shape android:shape="rectangle">
+              <gradient
+                android:startColor="#FFFFFF"
+                android:endColor="#ECEFF1"
+                android:angle="270" />
+              <corners android:radius="18dp" />
+              <stroke android:width="1.5dp" android:color="#CFD8DC" />
+            </shape>
+          </item>
+        </layer-list>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_btn_start.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+          <item android:top="5dp">
+            <shape android:shape="rectangle">
+              <solid android:color="#00332C" />
+              <corners android:radius="16dp" />
+            </shape>
+          </item>
+          <item android:bottom="5dp">
+            <shape android:shape="rectangle">
+              <gradient
+                android:startColor="#00897B"
+                android:endColor="#004D40"
+                android:angle="270" />
+              <corners android:radius="16dp" />
+              <stroke android:width="1.5dp" android:color="#A7FFEB" />
+            </shape>
+          </item>
+        </layer-list>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_btn_whatsapp.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+          <item android:top="4dp">
+            <shape android:shape="rectangle">
+              <solid android:color="#1B5E20" />
+              <corners android:radius="16dp" />
+            </shape>
+          </item>
+          <item android:bottom="4dp">
+            <shape android:shape="rectangle">
+              <gradient
+                android:startColor="#43A047"
+                android:endColor="#2E7D32"
+                android:angle="270" />
+              <corners android:radius="16dp" />
+              <stroke android:width="1.5dp" android:color="#B9F6CA" />
+            </shape>
+          </item>
+        </layer-list>
+        EOF
+
+        cat << 'EOF' > app/src/main/res/drawable/ic_aks_logo.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+          android:width="108dp"
+          android:height="108dp"
+          android:viewportWidth="108"
+          android:viewportHeight="108">
+          <path android:fillColor="#004D40" android:pathData="M54,6 L98,30 L98,78 L54,102 L10,78 L10,30 Z" />
+          <path android:fillColor="#00897B" android:pathData="M54,6 L98,30 L54,54 L10,30 Z" />
+          <path android:fillColor="#26A69A" android:pathData="M54,54 L98,30 L98,78 L54,102 Z" />
+          <path android:fillColor="#FFFFFF" android:pathData="M36,68 L54,32 L72,68 L63,68 L54,49 L45,68 Z" />
+          <path android:fillColor="#FFD54F" android:pathData="M44,58 L64,58 L64,63 L44,63 Z" />
+        </vector>
+        EOF
+
         cat << 'EOF' > app/src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+          <uses-permission android:name="android.permission.CALL_PHONE" />
           <uses-permission android:name="android.permission.SEND_SMS" />
-          <uses-permission android:name="android.permission.RECEIVE_SMS" />
-          <uses-permission android:name="android.permission.READ_SMS" />
           <uses-permission android:name="android.permission.READ_PHONE_STATE" />
           <application
             android:allowBackup="true"
-            android:label="AKS SMS"
-            android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar">
+            android:icon="@drawable/ic_aks_logo"
+            android:roundIcon="@drawable/ic_aks_logo"
+            android:label="AKS CNIC"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
             <activity android:name=".MainActivity" android:exported="true">
               <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -109,266 +204,431 @@ jobs:
         <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          android:background="#F4F6F8">
+          android:background="#E0E5EC">
+
           <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-            <TextView
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="AKS SMS - 668 Auto Verifier"
-              android:textSize="20sp"
-              android:textStyle="bold"
-              android:textColor="#00695C"
-              android:gravity="center"
-              android:paddingBottom="12dp" />
-            <RadioGroup
-              android:id="@+id/simGroup"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:gravity="center"
-              android:paddingBottom="8dp">
-              <RadioButton
-                android:id="@+id/rbSim1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SIM 1"
-                android:checked="true"
-                android:layout_marginEnd="24dp" />
-              <RadioButton
-                android:id="@+id/rbSim2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SIM 2" />
-            </RadioGroup>
+
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:gravity="center_vertical"
-              android:paddingBottom="8dp">
+              android:background="@drawable/bg_3d_header"
+              android:elevation="10dp"
+              android:gravity="center"
+              android:orientation="vertical"
+              android:padding="18dp"
+              android:layout_marginBottom="16dp">
+
+              <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/ic_aks_logo"
+                android:contentDescription="AKS Logo" />
+
               <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delay (1-50s): "
+                android:text="AKS CNIC"
+                android:textColor="#FFFFFF"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:shadowColor="#00251A"
+                android:shadowDx="2"
+                android:shadowDy="3"
+                android:shadowRadius="4"
+                android:paddingTop="6dp" />
+
+              <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3D Auto USSD (*336*1*2#) &amp; 9771 Sender"
+                android:textColor="#B2DFDB"
+                android:textSize="13sp"
                 android:textStyle="bold" />
-              <EditText
-                android:id="@+id/etDelay"
-                android:layout_width="80dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:text="5"
-                android:gravity="center" />
             </LinearLayout>
-            <EditText
-              android:id="@+id/etCnics"
-              android:layout_width="match_parent"
-              android:layout_height="140dp"
-              android:hint="Enter CNIC numbers (one per line)"
-              android:inputType="textMultiLine"
-              android:gravity="top|start"
-              android:background="#FFFFFF"
-              android:padding="10dp" />
+
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:layout_marginTop="10dp">
-              <Button
-                android:id="@+id/btnStart"
-                android:layout_width="0dp"
+              android:background="@drawable/bg_3d_card"
+              android:elevation="8dp"
+              android:orientation="vertical"
+              android:padding="16dp"
+              android:layout_marginBottom="16dp">
+
+              <TextView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Start Sending"
-                android:backgroundTint="#00695C"
-                android:textColor="#FFFFFF" />
-              <Button
-                android:id="@+id/btnStop"
-                android:layout_width="0dp"
+                android:text="Select Active SIM"
+                android:textColor="#37474F"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingBottom="6dp" />
+
+              <RadioGroup
+                android:id="@+id/simGroup"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="Stop"
-                android:backgroundTint="#C62828"
-                android:textColor="#FFFFFF" />
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingBottom="12dp">
+                <RadioButton
+                  android:id="@+id/rbSim1"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="SIM 1"
+                  android:textSize="16sp"
+                  android:textStyle="bold"
+                  android:textColor="#004D40"
+                  android:checked="true"
+                  android:layout_marginEnd="36dp" />
+                <RadioButton
+                  android:id="@+id/rbSim2"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="SIM 2"
+                  android:textSize="16sp"
+                  android:textStyle="bold"
+                  android:textColor="#004D40" />
+              </RadioGroup>
+
+              <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="#F5F7FA"
+                android:padding="10dp">
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Next KMA Code: "
+                  android:textSize="15sp"
+                  android:textStyle="bold"
+                  android:textColor="#263238" />
+                <EditText
+                  android:id="@+id/etCounter"
+                  android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:inputType="number"
+                  android:text="9801"
+                  android:textSize="18sp"
+                  android:textStyle="bold"
+                  android:textColor="#00695C"
+                  android:gravity="center" />
+                <Button
+                  android:id="@+id/btnSaveCounter"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Set"
+                  android:backgroundTint="#00695C"
+                  android:textColor="#FFFFFF" />
+              </LinearLayout>
             </LinearLayout>
-            <TextView
-              android:id="@+id/tvStatus"
+
+            <androidx.appcompat.widget.AppCompatButton
+              android:id="@+id/btnStart"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="Status: Ready"
+              android:layout_height="68dp"
+              android:background="@drawable/bg_3d_btn_start"
+              android:elevation="10dp"
+              android:text="START (*336*1*2#  ->  9771)"
+              android:textColor="#FFFFFF"
+              android:textSize="18sp"
               android:textStyle="bold"
-              android:paddingTop="10dp"
-              android:paddingBottom="6dp" />
-            <TextView
-              android:id="@+id/tvResults"
-              android:layout_width="match_parent"
-              android:layout_height="180dp"
-              android:background="#FFFFFF"
-              android:padding="10dp"
-              android:text="668 Replies will appear here...\n"
-              android:textIsSelectable="true" />
+              android:shadowColor="#00251A"
+              android:shadowDx="2"
+              android:shadowDy="2"
+              android:shadowRadius="3"
+              android:layout_marginBottom="16dp" />
+
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:layout_marginTop="10dp">
+              android:background="@drawable/bg_3d_card"
+              android:elevation="8dp"
+              android:orientation="vertical"
+              android:padding="16dp"
+              android:layout_marginBottom="16dp">
+
+              <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Status: Ready"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="#004D40"
+                android:paddingBottom="8dp" />
+
+              <TextView
+                android:id="@+id/tvSentMsg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sent Format: ---"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1B5E20"
+                android:background="#E8F5E9"
+                android:padding="12dp"
+                android:textIsSelectable="true" />
+
+              <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginTop="10dp"
+                android:background="#F5F7FA"
+                android:padding="10dp"
+                android:text="Activity Log:\n"
+                android:textColor="#37474F"
+                android:textIsSelectable="true" />
+
               <Button
                 android:id="@+id/btnCopy"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Copy Data" />
-              <Button
-                android:id="@+id/btnWhatsApp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="WhatsApp Help"
-                android:backgroundTint="#2E7D32"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:text="Copy Last Message"
+                android:backgroundTint="#37474F"
                 android:textColor="#FFFFFF" />
             </LinearLayout>
+
+            <androidx.appcompat.widget.AppCompatButton
+              android:id="@+id/btnWhatsApp"
+              android:layout_width="match_parent"
+              android:layout_height="60dp"
+              android:background="@drawable/bg_3d_btn_whatsapp"
+              android:elevation="8dp"
+              android:text="WhatsApp Contact: 03333997576"
+              android:textColor="#FFFFFF"
+              android:textSize="16sp"
+              android:textStyle="bold" />
+
           </LinearLayout>
         </ScrollView>
         EOF
 
-        cat << 'EOF' > app/src/main/java/com/aks/sms/MainActivity.kt
-        package com.aks.sms
+        cat << 'EOF' > app/src/main/java/com/aks/cnic/MainActivity.kt
+        package com.aks.cnic
 
         import android.Manifest
         import android.content.*
         import android.content.pm.PackageManager
+        import android.media.AudioManager
+        import android.media.ToneGenerator
         import android.net.Uri
         import android.os.*
-        import android.provider.Telephony
         import android.telephony.SmsManager
         import android.telephony.SubscriptionManager
+        import android.telephony.TelephonyManager
+        import android.view.SoundEffectConstants
         import android.widget.*
         import androidx.appcompat.app.AppCompatActivity
         import androidx.core.app.ActivityCompat
         import androidx.core.content.ContextCompat
 
         class MainActivity : AppCompatActivity() {
-          private var isRunning = false
-          private val handler = Handler(Looper.getMainLooper())
-          private lateinit var tvStatus: TextView
-          private lateinit var tvResults: TextView
-          private var lastSentCnic = ""
 
-          private val smsReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-              if (intent?.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
-                val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-                for (msg in messages) {
-                  val sender = msg.originatingAddress ?: ""
-                  if (sender.contains("668")) {
-                    val body = msg.messageBody ?: ""
-                    tvResults.append("CNIC: $lastSentCnic\nReply: $body\n----------------\n")
-                  }
-                }
-              }
-            }
-          }
+          private lateinit var tvStatus: TextView
+          private lateinit var tvSentMsg: TextView
+          private lateinit var tvLog: TextView
+          private lateinit var etCounter: EditText
+          private lateinit var prefs: SharedPreferences
+          private var lastFormattedMsg = ""
+          private var toneGen: ToneGenerator? = null
 
           override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
+
+            try {
+              toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 95)
+            } catch (_: Exception) {}
+
+            prefs = getSharedPreferences("AKS_CNIC_PREFS", Context.MODE_PRIVATE)
             val rbSim1 = findViewById<RadioButton>(R.id.rbSim1)
-            val etDelay = findViewById<EditText>(R.id.etDelay)
-            val etCnics = findViewById<EditText>(R.id.etCnics)
             val btnStart = findViewById<Button>(R.id.btnStart)
-            val btnStop = findViewById<Button>(R.id.btnStop)
+            val btnSaveCounter = findViewById<Button>(R.id.btnSaveCounter)
             val btnCopy = findViewById<Button>(R.id.btnCopy)
             val btnWhatsApp = findViewById<Button>(R.id.btnWhatsApp)
+            etCounter = findViewById(R.id.etCounter)
             tvStatus = findViewById(R.id.tvStatus)
-            tvResults = findViewById(R.id.tvResults)
+            tvSentMsg = findViewById(R.id.tvSentMsg)
+            tvLog = findViewById(R.id.tvLog)
+
+            val savedNum = prefs.getInt("kma_counter", 9801).coerceAtLeast(9801)
+            etCounter.setText(savedNum.toString())
 
             checkPermissions()
-            registerReceiver(smsReceiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
 
-            btnStart.setOnClickListener {
-              if (!checkPermissions()) return@setOnClickListener
-              val list = etCnics.text.toString().lines().map { it.trim() }.filter { it.isNotEmpty() }
-              if (list.isEmpty()) {
-                Toast.makeText(this, "Enter at least 1 CNIC", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            btnSaveCounter.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              val entered = etCounter.text.toString().toIntOrNull()
+              if (entered == null || entered < 9801) {
+                playErrorSound()
+                Toast.makeText(this, "Number must be 9801 or higher", Toast.LENGTH_SHORT).show()
+                etCounter.setText(prefs.getInt("kma_counter", 9801).toString())
+              } else {
+                prefs.edit().putInt("kma_counter", entered).apply()
+                playSuccessSound()
+                Toast.makeText(this, "Next code saved: KMA$entered", Toast.LENGTH_SHORT).show()
               }
-              val delaySec = (etDelay.text.toString().toIntOrNull() ?: 5).coerceIn(1, 50)
-              val simSlot = if (rbSim1.isChecked) 0 else 1
-              isRunning = true
-              sendNext(list, 0, delaySec, simSlot)
             }
 
-            btnStop.setOnClickListener {
-              isRunning = false
-              handler.removeCallbacksAndMessages(null)
-              tvStatus.text = "Status: Stopped"
+            btnStart.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              playStartSound()
+              if (!checkPermissions()) return@setOnClickListener
+              val simSlot = if (rbSim1.isChecked) 0 else 1
+              dialAndProcess("*336*1*2#", simSlot)
             }
 
             btnCopy.setOnClickListener {
-              val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-              clipboard.setPrimaryClip(ClipData.newPlainText("AKS SMS Data", tvResults.text.toString()))
-              Toast.makeText(this, "Data Copied!", Toast.LENGTH_SHORT).show()
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              if (lastFormattedMsg.isNotEmpty()) {
+                copyToClipboard(lastFormattedMsg)
+                playSuccessSound()
+              } else {
+                playErrorSound()
+                Toast.makeText(this, "Nothing sent yet", Toast.LENGTH_SHORT).show()
+              }
             }
 
             btnWhatsApp.setOnClickListener {
-              startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
-            }
-          }
-
-          private fun sendNext(list: List<String>, index: Int, delaySec: Int, simSlot: Int) {
-            if (!isRunning || index >= list.size) {
-              isRunning = false
-              tvStatus.text = "Status: Completed"
-              return
-            }
-            val cnic = list[index]
-            lastSentCnic = cnic
-            tvStatus.text = "Sending (${index + 1}/${list.size}): $cnic"
-            sendSmsViaSim(cnic, simSlot)
-            handler.postDelayed({ sendNext(list, index + 1, delaySec, simSlot) }, delaySec * 1000L)
-          }
-
-          private fun sendSmsViaSim(text: String, simSlot: Int) {
-            try {
-              val subManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-              if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-                val subList = subManager.activeSubscriptionInfoList
-                val subId = if (!subList.isNullOrEmpty() && simSlot < subList.size) subList[simSlot].subscriptionId else SmsManager.getDefaultSmsSubscriptionId()
-                val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                  getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
-                } else {
-                  @Suppress("DEPRECATION")
-                  SmsManager.getSmsManagerForSubscriptionId(subId)
-                }
-                smsManager.sendTextMessage("668", null, text, null, null)
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              playStartSound()
+              try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
+              } catch (e: Exception) {
+                Toast.makeText(this, "WhatsApp: 03333997576", Toast.LENGTH_LONG).show()
               }
+            }
+          }
+
+          private fun dialAndProcess(ussdCode: String, simSlot: Int) {
+            try {
+              if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
+                  ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED ||
+                  ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+                checkPermissions()
+                return
+              }
+
+              tvStatus.text = "Status: Dialing $ussdCode ..."
+              val subId = getSubIdForSlot(simSlot)
+              val baseManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+              val telephonyManager = baseManager.createForSubscriptionId(subId)
+
+              telephonyManager.sendUssdRequest(
+                ussdCode,
+                object : TelephonyManager.UssdResponseCallback() {
+                  override fun onReceiveUssdResponse(tm: TelephonyManager, request: String, response: CharSequence) {
+                    val reply = response.toString()
+                    val cleanDigits = reply.replace("-", "")
+                    val match = Regex("\\b\\d{13}\\b").find(cleanDigits)
+
+                    if (match != null) {
+                      val cnic = match.value
+                      copyToClipboard(cnic)
+
+                      val currentNum = prefs.getInt("kma_counter", 9801).coerceAtLeast(9801)
+                      val smsBody = "REG $cnic KMA$currentNum S 03102018"
+
+                      val nextNum = currentNum + 1
+                      prefs.edit().putInt("kma_counter", nextNum).apply()
+                      etCounter.setText(nextNum.toString())
+
+                      sendSmsTo9771(smsBody, subId)
+                      lastFormattedMsg = smsBody
+                      tvSentMsg.text = "Sent to 9771:\n$smsBody"
+                      tvStatus.text = "Status: Sent KMA$currentNum! Next: KMA$nextNum"
+                      tvLog.append("OK -> $smsBody\n")
+                      playSuccessSound()
+                    } else {
+                      playErrorSound()
+                      tvStatus.text = "Status: CNIC not found in USSD reply"
+                      tvLog.append("Reply: $reply\n")
+                    }
+                  }
+
+                  override fun onReceiveUssdResponseFailed(tm: TelephonyManager, request: String, failureCode: Int) {
+                    playErrorSound()
+                    tvStatus.text = "Status: USSD Failed (Code: $failureCode)"
+                  }
+                },
+                Handler(Looper.getMainLooper())
+              )
             } catch (e: Exception) {
+              playErrorSound()
               tvStatus.text = "Error: ${e.message}"
             }
           }
 
+          private fun sendSmsTo9771(message: String, subId: Int) {
+            val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+              getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
+            } else {
+              @Suppress("DEPRECATION")
+              SmsManager.getSmsManagerForSubscriptionId(subId)
+            }
+            smsManager.sendTextMessage("9771", null, message, null, null)
+          }
+
+          private fun getSubIdForSlot(simSlot: Int): Int {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+              val subManager = getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+              val subList = subManager.activeSubscriptionInfoList
+              if (!subList.isNullOrEmpty() && simSlot < subList.size) {
+                return subList[simSlot].subscriptionId
+              }
+            }
+            return SubscriptionManager.getDefaultSubscriptionId()
+          }
+
+          private fun copyToClipboard(text: String) {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("CNIC_DATA", text))
+            Toast.makeText(this, "Copied: $text", Toast.LENGTH_SHORT).show()
+          }
+
+          private fun playStartSound() {
+            try { toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP, 150) } catch (_: Exception) {}
+          }
+
+          private fun playSuccessSound() {
+            try { toneGen?.startTone(ToneGenerator.TONE_PROP_ACK, 300) } catch (_: Exception) {}
+          }
+
+          private fun playErrorSound() {
+            try { toneGen?.startTone(ToneGenerator.TONE_PROP_NACK, 350) } catch (_: Exception) {}
+          }
+
           private fun checkPermissions(): Boolean {
-            val perms = arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS, Manifest.permission.READ_PHONE_STATE)
+            val perms = arrayOf(
+              Manifest.permission.CALL_PHONE,
+              Manifest.permission.SEND_SMS,
+              Manifest.permission.READ_PHONE_STATE
+            )
             val needed = perms.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
             return if (needed.isNotEmpty()) {
-              ActivityCompat.requestPermissions(this, needed.toTypedArray(), 101)
+              ActivityCompat.requestPermissions(this, needed.toTypedArray(), 104)
               false
             } else true
           }
 
           override fun onDestroy() {
             super.onDestroy()
-            unregisterReceiver(smsReceiver)
+            toneGen?.release()
           }
         }
         EOF
 
-        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/sms/MainActivity.kt
+        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/drawable/bg_3d_header.xml app/src/main/res/drawable/bg_3d_card.xml app/src/main/res/drawable/bg_3d_btn_start.xml app/src/main/res/drawable/bg_3d_btn_whatsapp.xml app/src/main/res/drawable/ic_aks_logo.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/cnic/MainActivity.kt
 
     - name: Build Debug APK
       run: gradle assembleDebug --no-daemon
@@ -376,5 +636,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: AKS-SMS-APK
+        name: AKS-CNIC-3D-APK
         path: app/build/outputs/apk/debug/app-debug.apk

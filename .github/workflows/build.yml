@@ -1,4 +1,4 @@
-name: Build AKS DAILER Petrol 3D APK
+name: Build AKS 50X Unique Devices APK
 
 on:
   push:
@@ -23,9 +23,9 @@ jobs:
       with:
         gradle-version: '8.4'
 
-    - name: Generate AKS DAILER Project
+    - name: Generate AKS 50X Unique Devices Project
       run: |
-        mkdir -p app/src/main/java/com/aks/dailer app/src/main/res/layout app/src/main/res/drawable app/src/main/res/xml app/src/main/res/values
+        mkdir -p app/src/main/java/com/aks/multi50 app/src/main/res/layout app/src/main/res/drawable app/src/main/res/values
 
         cat << 'EOF' > settings.gradle.kts
         pluginManagement {
@@ -35,7 +35,7 @@ jobs:
           repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
           repositories { google(); mavenCentral() }
         }
-        rootProject.name = "AKS_DAILER"
+        rootProject.name = "AKS_50X_Devices"
         include(":app")
         EOF
 
@@ -58,11 +58,11 @@ jobs:
           id("org.jetbrains.kotlin.android")
         }
         android {
-          namespace = "com.aks.dailer"
+          namespace = "com.aks.multi50"
           compileSdk = 34
           defaultConfig {
-            applicationId = "com.aks.dailer"
-            minSdk = 24
+            applicationId = "com.aks.multi50"
+            minSdk = 28
             targetSdk = 34
             versionCode = 1
             versionName = "1.0"
@@ -80,176 +80,78 @@ jobs:
           implementation("androidx.core:core-ktx:1.12.0")
           implementation("androidx.appcompat:appcompat:1.6.1")
           implementation("com.google.android.material:material:1.11.0")
+          implementation("androidx.webkit:webkit:1.10.0")
         }
         EOF
 
         cat << 'EOF' > app/src/main/res/values/strings.xml
         <?xml version="1.0" encoding="utf-8"?>
         <resources>
-          <string name="app_name">AKS DAILER</string>
-          <string name="acc_desc">AKS DAILER Auto CNIC Reader</string>
+          <string name="app_name">AKS 50X Devices</string>
         </resources>
         EOF
 
-        cat << 'EOF' > app/src/main/res/xml/accessibility_service_config.xml
+        cat << 'EOF' > app/src/main/res/drawable/bg_phone_frame.xml
         <?xml version="1.0" encoding="utf-8"?>
-        <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-          android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
-          android:accessibilityFeedbackType="feedbackGeneric"
-          android:accessibilityFlags="flagDefault|flagRetrieveInteractiveWindows"
-          android:canRetrieveWindowContent="true"
-          android:description="@string/acc_desc"
-          android:notificationTimeout="100" />
+        <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+          <solid android:color="#101820" />
+          <corners android:radius="12dp" />
+          <stroke android:width="2dp" android:color="#00BFA5" />
+        </shape>
         EOF
 
-        cat << 'EOF' > app/src/main/res/drawable/bg_3d_header.xml
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_btn.xml
         <?xml version="1.0" encoding="utf-8"?>
         <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-          <item android:top="6dp">
+          <item android:top="3dp">
             <shape android:shape="rectangle">
-              <solid android:color="#0D1B2A" />
-              <corners android:radius="22dp" />
+              <solid android:color="#00332C" />
+              <corners android:radius="10dp" />
             </shape>
           </item>
-          <item android:bottom="6dp">
+          <item android:bottom="3dp">
             <shape android:shape="rectangle">
-              <gradient
-                android:startColor="#004D40"
-                android:centerColor="#00796B"
-                android:endColor="#26A69A"
-                android:angle="135" />
-              <corners android:radius="22dp" />
-              <stroke android:width="2dp" android:color="#80CBC4" />
+              <gradient android:startColor="#00BFA5" android:endColor="#00695C" android:angle="270" />
+              <corners android:radius="10dp" />
             </shape>
           </item>
         </layer-list>
         EOF
 
-        cat << 'EOF' > app/src/main/res/drawable/bg_3d_card.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-          <item android:top="5dp" android:left="2dp" android:right="2dp">
-            <shape android:shape="rectangle">
-              <solid android:color="#90A4AE" />
-              <corners android:radius="18dp" />
-            </shape>
-          </item>
-          <item android:bottom="5dp">
-            <shape android:shape="rectangle">
-              <gradient
-                android:startColor="#FFFFFF"
-                android:endColor="#ECEFF1"
-                android:angle="270" />
-              <corners android:radius="18dp" />
-              <stroke android:width="1.5dp" android:color="#CFD8DC" />
-            </shape>
-          </item>
-        </layer-list>
-        EOF
-
-        cat << 'EOF' > app/src/main/res/drawable/bg_3d_btn_start.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-          <item android:top="6dp">
-            <shape android:shape="rectangle">
-              <solid android:color="#00251A" />
-              <corners android:radius="18dp" />
-            </shape>
-          </item>
-          <item android:bottom="6dp">
-            <shape android:shape="rectangle">
-              <gradient
-                android:startColor="#00BFA5"
-                android:centerColor="#00897B"
-                android:endColor="#004D40"
-                android:angle="270" />
-              <corners android:radius="18dp" />
-              <stroke android:width="2dp" android:color="#A7FFEB" />
-            </shape>
-          </item>
-        </layer-list>
-        EOF
-
-        cat << 'EOF' > app/src/main/res/drawable/bg_3d_btn_stop.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-          <item android:top="5dp">
-            <shape android:shape="rectangle">
-              <solid android:color="#7F0000" />
-              <corners android:radius="18dp" />
-            </shape>
-          </item>
-          <item android:bottom="5dp">
-            <shape android:shape="rectangle">
-              <gradient
-                android:startColor="#EF5350"
-                android:endColor="#C62828"
-                android:angle="270" />
-              <corners android:radius="18dp" />
-              <stroke android:width="1.5dp" android:color="#FFCDD2" />
-            </shape>
-          </item>
-        </layer-list>
-        EOF
-
-        cat << 'EOF' > app/src/main/res/drawable/ic_petrol_pump_3d.xml
+        cat << 'EOF' > app/src/main/res/drawable/ic_aks_devices.xml
         <?xml version="1.0" encoding="utf-8"?>
         <vector xmlns:android="http://schemas.android.com/apk/res/android"
           android:width="108dp"
           android:height="108dp"
           android:viewportWidth="108"
           android:viewportHeight="108">
-          <path android:fillColor="#00251A" android:pathData="M14,14 L94,14 Q102,14 102,22 L102,94 Q102,102 94,102 L14,102 Q6,102 6,94 L6,22 Q6,14 14,14 Z" />
-          <path android:fillColor="#004D40" android:pathData="M14,8 L94,8 Q102,8 102,16 L102,88 Q102,96 94,96 L14,96 Q6,96 6,88 L6,16 Q6,8 14,8 Z" />
-          <path android:fillColor="#263238" android:pathData="M24,82 L70,82 L70,88 L24,88 Z" />
-          <path android:fillColor="#B71C1C" android:pathData="M62,24 L68,28 L68,82 L62,82 Z" />
-          <path android:fillColor="#E53935" android:pathData="M30,22 L62,22 Q65,22 65,25 L65,82 L27,82 L27,25 Q27,22 30,22 Z" />
-          <path android:fillColor="#FFCA28" android:pathData="M25,18 L67,18 L67,24 L25,24 Z" />
-          <path android:fillColor="#E0F7FA" android:pathData="M33,30 L59,30 L59,48 L33,48 Z" />
-          <path android:fillColor="#00695C" android:pathData="M36,34 L56,34 L56,38 L36,38 Z" />
-          <path android:fillColor="#00897B" android:pathData="M36,41 L50,41 L50,44 L36,44 Z" />
-          <path android:fillColor="#FFD54F" android:pathData="M46,54 C46,54 39,63 39,68 C39,72 42,75 46,75 C50,75 53,72 53,68 C53,63 46,54 46,54 Z" />
-          <path android:fillColor="#ECEFF1" android:pathData="M65,42 L74,42 Q78,42 78,46 L78,70 Q78,75 73,75 L69,75 L69,71 L73,71 Q74,71 74,70 L74,46 L65,46 Z" />
-          <path android:fillColor="#FFCA28" android:pathData="M71,34 L82,34 L82,42 L75,42 L75,38 L71,38 Z" />
+          <path android:fillColor="#004D40" android:pathData="M14,8 L94,8 Q102,8 102,16 L102,92 Q102,100 94,100 L14,100 Q6,100 6,92 L6,16 Q6,8 14,8 Z" />
+          <path android:fillColor="#FFFFFF" android:pathData="M42,32 L76,54 L42,76 Z" />
         </vector>
         EOF
 
         cat << 'EOF' > app/src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-          <uses-permission android:name="android.permission.CALL_PHONE" />
-          <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-          <uses-permission android:name="android.permission.SEND_SMS" />
-          <uses-permission android:name="android.permission.RECEIVE_SMS" />
-          <uses-permission android:name="android.permission.READ_SMS" />
+          <uses-permission android:name="android.permission.INTERNET" />
+          <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
           <application
             android:allowBackup="true"
-            android:icon="@drawable/ic_petrol_pump_3d"
-            android:roundIcon="@drawable/ic_petrol_pump_3d"
+            android:hardwareAccelerated="true"
+            android:icon="@drawable/ic_aks_devices"
+            android:roundIcon="@drawable/ic_aks_devices"
             android:label="@string/app_name"
+            android:usesCleartextTraffic="true"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
-            <activity android:name=".MainActivity" android:exported="true">
+            <activity
+              android:name=".MainActivity"
+              android:configChanges="orientation|screenSize|keyboardHidden"
+              android:exported="true">
               <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
               </intent-filter>
             </activity>
-            <service
-              android:name=".UssdReaderService"
-              android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-              android:exported="true">
-              <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-              </intent-filter>
-              <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_service_config" />
-            </service>
-            <receiver android:name=".SmsReplyReceiver" android:exported="true" android:permission="android.permission.BROADCAST_SMS">
-              <intent-filter android:priority="999">
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-              </intent-filter>
-            </receiver>
           </application>
         </manifest>
         EOF
@@ -260,765 +162,580 @@ jobs:
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:orientation="vertical"
-          android:background="#DCE3EB">
+          android:background="#0B131E">
 
-          <TextView
-            android:id="@+id/tvWhatsAppTicker"
+          <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="36dp"
-            android:background="#1B5E20"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:gravity="center_vertical"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:scrollHorizontally="true"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:text="   WhatsApp Contact: 03333997576   |   AKS DAILER Official Support: 03333997576   |   Tap here for WhatsApp: 03333997576   " />
-
-          <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#004D40"
+            android:padding="8dp">
 
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:padding="14dp">
+              android:orientation="horizontal"
+              android:gravity="center_vertical"
+              android:paddingBottom="4dp">
 
-              <LinearLayout
-                android:layout_width="match_parent"
+              <TextView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_3d_header"
-                android:elevation="12dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:layout_marginBottom="12dp">
+                android:layout_weight="1"
+                android:text="AKS 50X DEVICES"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="14sp" />
 
-                <ImageView
-                  android:layout_width="76dp"
-                  android:layout_height="76dp"
-                  android:src="@drawable/ic_petrol_pump_3d"
-                  android:contentDescription="Petrol Pump Logo" />
+              <Button
+                android:id="@+id/btnBulkIp"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="50 IPs"
+                android:textSize="10sp"
+                android:backgroundTint="#FF8F00"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="3dp" />
 
-                <TextView
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="AKS DAILER"
-                  android:textColor="#FFFFFF"
-                  android:textSize="28sp"
-                  android:textStyle="bold"
-                  android:shadowColor="#00251A"
-                  android:shadowDx="2"
-                  android:shadowDy="3"
-                  android:shadowRadius="4"
-                  android:paddingTop="6dp" />
-              </LinearLayout>
+              <Button
+                android:id="@+id/btnGmail"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="Gmail"
+                android:textSize="10sp"
+                android:backgroundTint="#1976D2"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="3dp" />
 
-              <LinearLayout
-                android:id="@+id/cardService"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_3d_card"
-                android:elevation="8dp"
-                android:orientation="vertical"
-                android:padding="10dp"
-                android:layout_marginBottom="12dp">
+              <Button
+                android:id="@+id/btnYouTube"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="YT"
+                android:textSize="10sp"
+                android:backgroundTint="#D32F2F"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="3dp" />
 
-                <TextView
-                  android:id="@+id/tvServiceStatus"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="Screen Reader: OFF"
-                  android:textColor="#C62828"
-                  android:textStyle="bold"
-                  android:textSize="13sp"
-                  android:gravity="center"
-                  android:paddingBottom="4dp" />
+              <Button
+                android:id="@+id/btnTikTok"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="TikTok"
+                android:textSize="10sp"
+                android:backgroundTint="#111111"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="3dp" />
 
-                <Button
-                  android:id="@+id/btnEnableService"
-                  android:layout_width="match_parent"
-                  android:layout_height="42dp"
-                  android:backgroundTint="#E64A19"
-                  android:text="Enable AKS DAILER Service"
-                  android:textColor="#FFFFFF"
-                  android:textStyle="bold" />
-              </LinearLayout>
-
-              <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_3d_card"
-                android:elevation="8dp"
-                android:orientation="vertical"
-                android:padding="14dp"
-                android:layout_marginBottom="12dp">
-
-                <RadioGroup
-                  android:id="@+id/simGroup"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:gravity="center"
-                  android:paddingBottom="8dp">
-                  <RadioButton
-                    android:id="@+id/rbSim1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="SIM 1"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textColor="#004D40"
-                    android:checked="true"
-                    android:layout_marginEnd="40dp" />
-                  <RadioButton
-                    android:id="@+id/rbSim2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="SIM 2"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    android:textColor="#004D40" />
-                </RadioGroup>
-
-                <TextView
-                  android:id="@+id/tvActiveKma"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="KMA9200"
-                  android:textSize="32sp"
-                  android:textStyle="bold"
-                  android:textColor="#00695C"
-                  android:background="#E0F2F1"
-                  android:padding="10dp"
-                  android:gravity="center"
-                  android:layout_marginBottom="8dp" />
-
-                <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:gravity="center_vertical">
-                  <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Start KMA: "
-                    android:textStyle="bold"
-                    android:textColor="#263238" />
-                  <EditText
-                    android:id="@+id/etStartNum"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:inputType="number"
-                    android:text="9200"
-                    android:textStyle="bold"
-                    android:gravity="center" />
-                  <Button
-                    android:id="@+id/btnSetNum"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Set"
-                    android:backgroundTint="#00695C"
-                    android:textColor="#FFFFFF" />
-                </LinearLayout>
-              </LinearLayout>
-
-              <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
-
-                <androidx.appcompat.widget.AppCompatButton
-                  android:id="@+id/btnStart"
-                  android:layout_width="0dp"
-                  android:layout_height="64dp"
-                  android:layout_weight="2"
-                  android:background="@drawable/bg_3d_btn_start"
-                  android:elevation="10dp"
-                  android:text="START"
-                  android:textColor="#FFFFFF"
-                  android:textSize="20sp"
-                  android:textStyle="bold" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                  android:id="@+id/btnStop"
-                  android:layout_width="0dp"
-                  android:layout_height="64dp"
-                  android:layout_weight="1"
-                  android:layout_marginStart="10dp"
-                  android:background="@drawable/bg_3d_btn_stop"
-                  android:elevation="10dp"
-                  android:text="STOP"
-                  android:textColor="#FFFFFF"
-                  android:textSize="18sp"
-                  android:textStyle="bold" />
-              </LinearLayout>
-
-              <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_3d_card"
-                android:elevation="8dp"
-                android:orientation="vertical"
-                android:padding="14dp">
-
-                <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:paddingBottom="6dp">
-                  <TextView
-                    android:id="@+id/tvCopiedCnic"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="CNIC: ---"
-                    android:textStyle="bold"
-                    android:textColor="#004D40" />
-                  <TextView
-                    android:id="@+id/tvCountSent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Count: 0"
-                    android:textStyle="bold"
-                    android:textColor="#1B5E20" />
-                </LinearLayout>
-
-                <TextView
-                  android:id="@+id/tvStatus"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="Status: Ready"
-                  android:textStyle="bold"
-                  android:textSize="14sp"
-                  android:textColor="#E65100"
-                  android:paddingBottom="6dp" />
-
-                <TextView
-                  android:id="@+id/tvSendingBox"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:background="#E8F5E9"
-                  android:padding="10dp"
-                  android:text="SENDING: ---"
-                  android:textStyle="bold"
-                  android:textColor="#1B5E20"
-                  android:textSize="13sp"
-                  android:layout_marginBottom="8dp" />
-
-                <TextView
-                  android:id="@+id/tvReceivingBox"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:background="#FFF8E1"
-                  android:padding="10dp"
-                  android:text="RECEIVED (9771): ---"
-                  android:textStyle="bold"
-                  android:textColor="#BF360C"
-                  android:textSize="14sp"
-                  android:layout_marginBottom="8dp" />
-
-                <TextView
-                  android:id="@+id/tvReport"
-                  android:layout_width="match_parent"
-                  android:layout_height="170dp"
-                  android:background="#F5F7FA"
-                  android:padding="10dp"
-                  android:text="Live History:\n"
-                  android:textSize="12sp"
-                  android:textColor="#263238"
-                  android:textIsSelectable="true" />
-
-                <Button
-                  android:id="@+id/btnResetReport"
-                  android:layout_width="match_parent"
-                  android:layout_height="42dp"
-                  android:layout_marginTop="8dp"
-                  android:text="Reset All"
-                  android:backgroundTint="#455A64"
-                  android:textColor="#FFFFFF" />
-              </LinearLayout>
-
+              <Button
+                android:id="@+id/btnWhatsApp"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:text="WA"
+                android:textSize="10sp"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF" />
             </LinearLayout>
+
+            <HorizontalScrollView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:scrollbars="none"
+              android:paddingBottom="4dp">
+              <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button android:id="@+id/btnBatch1" android:layout_width="wrap_content" android:layout_height="34dp" android:text="1-10" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
+                <Button android:id="@+id/btnBatch2" android:layout_width="wrap_content" android:layout_height="34dp" android:text="11-20" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
+                <Button android:id="@+id/btnBatch3" android:layout_width="wrap_content" android:layout_height="34dp" android:text="21-30" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
+                <Button android:id="@+id/btnBatch4" android:layout_width="wrap_content" android:layout_height="34dp" android:text="31-40" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
+                <Button android:id="@+id/btnBatch5" android:layout_width="wrap_content" android:layout_height="34dp" android:text="41-50" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
+                <Button android:id="@+id/btnBatchAll" android:layout_width="wrap_content" android:layout_height="34dp" android:text="ALL 50" android:textSize="11sp" android:backgroundTint="#E65100" android:textColor="#FFFFFF"/>
+              </LinearLayout>
+            </HorizontalScrollView>
+
+            <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:gravity="center_vertical">
+
+              <EditText
+                android:id="@+id/etUrl"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="#FFFFFF"
+                android:hint="Paste Video Link (YouTube / TikTok)..."
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:singleLine="true"
+                android:textColor="#000000"
+                android:textSize="12sp" />
+
+              <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnPlayActive"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_3d_btn"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="PLAY ALL"
+                android:textColor="#FFFFFF"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+              <Button
+                android:id="@+id/btnReloadActive"
+                android:layout_width="42dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:text="↻"
+                android:textSize="15sp"
+                android:backgroundTint="#37474F"
+                android:textColor="#FFFFFF" />
+            </LinearLayout>
+          </LinearLayout>
+
+          <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+              android:id="@+id/gridContainer"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:padding="4dp" />
           </ScrollView>
+
         </LinearLayout>
         EOF
 
-        cat << 'EOF' > app/src/main/java/com/aks/dailer/SmsLoopEngine.kt
-        package com.aks.dailer
+        cat << 'EOF' > app/src/main/java/com/aks/multi50/MainActivity.kt
+        package com.aks.multi50
 
+        import android.annotation.SuppressLint
+        import android.app.AlertDialog
         import android.content.Context
         import android.content.Intent
-        import android.media.AudioManager
-        import android.media.ToneGenerator
-        import android.os.Build
-        import android.os.Handler
-        import android.os.Looper
-        import android.telephony.SmsManager
-        import android.telephony.SubscriptionManager
-        import java.text.SimpleDateFormat
-        import java.util.*
-
-        object SmsLoopEngine {
-
-          private val fallbackHandler = Handler(Looper.getMainLooper())
-
-          fun sendNextSms(context: Context) {
-            val prefs = context.getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
-            if (!prefs.getBoolean("is_running", false)) return
-
-            val cnic = prefs.getString("saved_cnic", "") ?: ""
-            if (cnic.length != 13) return
-
-            val currentNum = prefs.getInt("kma_num", 9200)
-            val simSlot = prefs.getInt("selected_sim", 0)
-            val smsText = "REG $cnic KMA$currentNum S 03102018"
-            val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
-
-            try {
-              val subManager = context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-              val subList = subManager.activeSubscriptionInfoList
-              val subId = if (!subList.isNullOrEmpty() && simSlot < subList.size) {
-                subList[simSlot].subscriptionId
-              } else {
-                SubscriptionManager.getDefaultSmsSubscriptionId()
-              }
-              val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                context.getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
-              } else {
-                @Suppress("DEPRECATION")
-                SmsManager.getSmsManagerForSubscriptionId(subId)
-              }
-              smsManager.sendTextMessage("9771", null, smsText, null, null)
-
-              val sentCount = prefs.getInt("sent_count", 0) + 1
-              val nextNum = currentNum + 1
-
-              prefs.edit()
-                .putInt("kma_num", nextNum)
-                .putInt("sent_count", sentCount)
-                .putString("last_sent_text", "SENDING (#$sentCount): $smsText")
-                .putString("status_text", "Sent KMA$currentNum -> Waiting Reply...")
-                .apply()
-
-              appendHistory(context, "[$timeStr] SENT: $smsText")
-
-              try {
-                ToneGenerator(AudioManager.STREAM_NOTIFICATION, 95).startTone(ToneGenerator.TONE_PROP_BEEP, 180)
-              } catch (_: Exception) {}
-
-              fallbackHandler.removeCallbacksAndMessages(null)
-              fallbackHandler.postDelayed({
-                val p = context.getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
-                if (p.getBoolean("is_running", false)) {
-                  appendHistory(context, "No reply in 12s -> Next KMA${p.getInt("kma_num", 9200)}")
-                  sendNextSms(context)
-                }
-              }, 12000L)
-
-            } catch (e: Exception) {
-              appendHistory(context, "SMS Error: ${e.message}")
-            }
-          }
-
-          fun cancelPending() {
-            fallbackHandler.removeCallbacksAndMessages(null)
-          }
-
-          fun appendHistory(context: Context, line: String) {
-            val prefs = context.getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
-            val old = prefs.getString("live_history", "") ?: ""
-            prefs.edit().putString("live_history", "$line\n$old").apply()
-            context.sendBroadcast(Intent("com.aks.dailer.UI_UPDATE"))
-          }
-        }
-        EOF
-
-        cat << 'EOF' > app/src/main/java/com/aks/dailer/UssdReaderService.kt
-        package com.aks.dailer
-
-        import android.accessibilityservice.AccessibilityService
-        import android.content.*
-        import android.media.AudioManager
-        import android.media.ToneGenerator
-        import android.view.accessibility.AccessibilityEvent
-        import android.view.accessibility.AccessibilityNodeInfo
-
-        class UssdReaderService : AccessibilityService() {
-
-          override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-            val prefs = getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
-            if (!prefs.getBoolean("is_running", false)) return
-            if (!prefs.getBoolean("waiting_for_ussd", false)) return
-
-            val rootNode = rootInActiveWindow ?: return
-            val allText = StringBuilder()
-            collectText(rootNode, allText)
-            val cleanDigits = allText.toString().replace("-", "")
-            val match = Regex("\\b\\d{13}\\b").find(cleanDigits)
-
-            if (match != null) {
-              val cnic = match.value
-              prefs.edit()
-                .putBoolean("waiting_for_ussd", false)
-                .putString("saved_cnic", cnic)
-                .apply()
-
-              val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-              clipboard.setPrimaryClip(ClipData.newPlainText("CNIC", cnic))
-
-              clickDismissButton(rootNode)
-
-              try {
-                ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100).startTone(ToneGenerator.TONE_PROP_ACK, 250)
-              } catch (_: Exception) {}
-
-              SmsLoopEngine.appendHistory(this, "CNIC Copied Once: $cnic")
-              SmsLoopEngine.sendNextSms(this)
-            }
-          }
-
-          private fun collectText(node: AccessibilityNodeInfo?, sb: StringBuilder) {
-            if (node == null) return
-            if (node.text != null) sb.append(node.text).append(" ")
-            for (i in 0 until node.childCount) collectText(node.getChild(i), sb)
-          }
-
-          private fun clickDismissButton(node: AccessibilityNodeInfo?) {
-            if (node == null) return
-            val labels = listOf("OK", "Cancel", "Dismiss", "Close", "ٹھیک ہے")
-            for (label in labels) {
-              val nodes = node.findAccessibilityNodeInfosByText(label)
-              for (n in nodes) {
-                if (n.isClickable) {
-                  n.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                  return
-                }
-              }
-            }
-          }
-
-          override fun onInterrupt() {}
-        }
-        EOF
-
-        cat << 'EOF' > app/src/main/java/com/aks/dailer/SmsReplyReceiver.kt
-        package com.aks.dailer
-
-        import android.content.BroadcastReceiver
-        import android.content.Context
-        import android.content.Intent
-        import android.media.AudioManager
-        import android.media.ToneGenerator
-        import android.os.Handler
-        import android.os.Looper
-        import android.provider.Telephony
-        import java.text.SimpleDateFormat
-        import java.util.*
-
-        class SmsReplyReceiver : BroadcastReceiver() {
-          override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
-            val prefs = context.getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
-            if (!prefs.getBoolean("is_running", false)) return
-
-            val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-            for (msg in messages) {
-              val sender = msg.originatingAddress ?: ""
-              if (sender.contains("9771") || sender.contains("7991")) {
-                SmsLoopEngine.cancelPending()
-                val rawBody = msg.messageBody ?: ""
-                val lowerBody = rawBody.lowercase(Locale.getDefault())
-                val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
-
-                prefs.edit().putString("last_received_text", "RECEIVED (9771): $rawBody").apply()
-                SmsLoopEngine.appendHistory(context, "[$timeStr] REPLY: $rawBody")
-
-                val isKamyab = lowerBody.contains("کامیاب") ||
-                               lowerBody.contains("مبارک") ||
-                               lowerBody.contains("تصدیق") ||
-                               lowerBody.contains("success") ||
-                               lowerBody.contains("kamyab") ||
-                               lowerBody.contains("registered") ||
-                               lowerBody.contains("approved")
-
-                if (isKamyab) {
-                  prefs.edit()
-                    .putBoolean("is_running", false)
-                    .putString("status_text", "کامیاب! (KAMYAB MESSAGE RECEIVED)")
-                    .apply()
-
-                  SmsLoopEngine.appendHistory(context, "*** کامیاب میسج آ گیا! پروسیس مکمل ***")
-                  try {
-                    ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100).startTone(ToneGenerator.TONE_PROP_ACK, 600)
-                  } catch (_: Exception) {}
-                } else {
-                  val nextKma = prefs.getInt("kma_num", 9200)
-                  prefs.edit().putString("status_text", "کامیاب نہیں ہوا -> اگلا KMA$nextKma جا رہا ہے...").apply()
-                  Handler(Looper.getMainLooper()).postDelayed({
-                    SmsLoopEngine.sendNextSms(context)
-                  }, 1500L)
-                }
-              }
-            }
-          }
-        }
-        EOF
-
-        cat << 'EOF' > app/src/main/java/com/aks/dailer/MainActivity.kt
-        package com.aks.dailer
-
-        import android.Manifest
-        import android.content.*
-        import android.content.pm.PackageManager
+        import android.graphics.Color
         import android.media.AudioManager
         import android.media.ToneGenerator
         import android.net.Uri
-        import android.os.Build
         import android.os.Bundle
-        import android.provider.Settings
-        import android.telecom.PhoneAccountHandle
-        import android.telecom.TelecomManager
-        import android.text.TextUtils
-        import android.view.SoundEffectConstants
+        import android.view.Gravity
         import android.view.View
+        import android.view.ViewGroup
+        import android.webkit.*
         import android.widget.*
         import androidx.appcompat.app.AppCompatActivity
-        import androidx.core.app.ActivityCompat
-        import androidx.core.content.ContextCompat
+        import androidx.webkit.ProxyConfig
+        import androidx.webkit.ProxyController
+        import androidx.webkit.WebViewCompat
+        import androidx.webkit.WebViewFeature
 
         class MainActivity : AppCompatActivity() {
 
-          private lateinit var cardService: LinearLayout
-          private lateinit var tvServiceStatus: TextView
-          private lateinit var tvActiveKma: TextView
-          private lateinit var tvCopiedCnic: TextView
-          private lateinit var tvCountSent: TextView
-          private lateinit var tvStatus: TextView
-          private lateinit var tvSendingBox: TextView
-          private lateinit var tvReceivingBox: TextView
-          private lateinit var tvReport: TextView
-          private lateinit var etStartNum: EditText
-          private lateinit var prefs: SharedPreferences
+          private val totalPhones = 50
+          private val webViews = arrayOfNulls<WebView>(totalPhones)
+          private val cardContainers = mutableListOf<LinearLayout>()
+          private val rowContainers = mutableListOf<LinearLayout>()
+          private val titleViews = mutableListOf<TextView>()
+          private val ipLabels = mutableListOf<TextView>()
+          private var expandedIndex = -1
+          private var activeStartIdx = 0
+          private var activeEndIdx = 9
           private var toneGen: ToneGenerator? = null
+          private lateinit var gridContainer: LinearLayout
 
-          private val uiReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-              refreshScreen()
-            }
-          }
+          private val deviceModels = listOf(
+            "Galaxy S24", "Vivo V29", "Oppo Reno11", "Xiaomi 14", "Pixel 8",
+            "Realme 12", "OnePlus 12", "Infinix Note30", "Tecno Camon20", "Redmi Note13",
+            "Galaxy A54", "Vivo Y100", "Oppo F25", "Poco X6", "Pixel 7a",
+            "Realme C67", "OnePlus Nord3", "Infinix Zero30", "Tecno Spark20", "Redmi 13C",
+            "Galaxy S23", "Vivo X100", "Oppo FindX7", "Xiaomi 13T", "Pixel 8 Pro",
+            "Realme GT5", "OnePlus 11R", "Infinix Hot40", "Tecno Pova5", "Poco F5",
+            "Galaxy M34", "Vivo T2 Pro", "Oppo A79", "Redmi Note12", "Pixel 6a",
+            "Realme Narzo60", "OnePlus Ace3", "Infinix Smart8", "Tecno PhantomX2", "Xiaomi 12Pro",
+            "Galaxy ZFlip5", "Vivo V27", "Oppo K11", "Poco M6", "Pixel 7",
+            "Realme 11Pro", "OnePlus 10T", "Infinix GT10", "Tecno Camon30", "Galaxy A35"
+          )
 
           override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
 
             try {
-              toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 95)
+              toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 90)
             } catch (_: Exception) {}
 
-            prefs = getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
-            val tvWhatsAppTicker = findViewById<TextView>(R.id.tvWhatsAppTicker)
-            tvWhatsAppTicker.isSelected = true
+            val etUrl = findViewById<EditText>(R.id.etUrl)
+            val btnPlayActive = findViewById<Button>(R.id.btnPlayActive)
+            val btnReloadActive = findViewById<Button>(R.id.btnReloadActive)
+            val btnBulkIp = findViewById<Button>(R.id.btnBulkIp)
+            val btnGmail = findViewById<Button>(R.id.btnGmail)
+            val btnYouTube = findViewById<Button>(R.id.btnYouTube)
+            val btnTikTok = findViewById<Button>(R.id.btnTikTok)
+            val btnWhatsApp = findViewById<Button>(R.id.btnWhatsApp)
+            gridContainer = findViewById(R.id.gridContainer)
 
-            cardService = findViewById(R.id.cardService)
-            tvServiceStatus = findViewById(R.id.tvServiceStatus)
-            tvActiveKma = findViewById(R.id.tvActiveKma)
-            tvCopiedCnic = findViewById(R.id.tvCopiedCnic)
-            tvCountSent = findViewById(R.id.tvCountSent)
-            tvStatus = findViewById(R.id.tvStatus)
-            tvSendingBox = findViewById(R.id.tvSendingBox)
-            tvReceivingBox = findViewById(R.id.tvReceivingBox)
-            tvReport = findViewById(R.id.tvReport)
-            etStartNum = findViewById(R.id.etStartNum)
+            buildFiftyCardsSkeleton()
+            showBatch(0, 9)
 
-            val rbSim1 = findViewById<RadioButton>(R.id.rbSim1)
-            val btnEnableService = findViewById<Button>(R.id.btnEnableService)
-            val btnSetNum = findViewById<Button>(R.id.btnSetNum)
-            val btnStart = findViewById<Button>(R.id.btnStart)
-            val btnStop = findViewById<Button>(R.id.btnStop)
-            val btnResetReport = findViewById<Button>(R.id.btnResetReport)
+            findViewById<Button>(R.id.btnBatch1).setOnClickListener { playBeep(); showBatch(0, 9) }
+            findViewById<Button>(R.id.btnBatch2).setOnClickListener { playBeep(); showBatch(10, 19) }
+            findViewById<Button>(R.id.btnBatch3).setOnClickListener { playBeep(); showBatch(20, 29) }
+            findViewById<Button>(R.id.btnBatch4).setOnClickListener { playBeep(); showBatch(30, 39) }
+            findViewById<Button>(R.id.btnBatch5).setOnClickListener { playBeep(); showBatch(40, 49) }
+            findViewById<Button>(R.id.btnBatchAll).setOnClickListener { playBeep(); showBatch(0, 49) }
 
-            checkPermissions()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-              registerReceiver(uiReceiver, IntentFilter("com.aks.dailer.UI_UPDATE"), Context.RECEIVER_NOT_EXPORTED)
-            } else {
-              registerReceiver(uiReceiver, IntentFilter("com.aks.dailer.UI_UPDATE"))
+            btnBulkIp.setOnClickListener {
+              playBeep()
+              showBulkIpDialog()
             }
 
-            tvWhatsAppTicker.setOnClickListener {
+            btnGmail.setOnClickListener {
+              playBeep()
+              etUrl.setText("https://accounts.google.com")
+              loadUrlInActiveBatch("https://accounts.google.com")
+            }
+
+            btnYouTube.setOnClickListener {
+              playBeep()
+              etUrl.setText("https://m.youtube.com")
+              loadUrlInActiveBatch("https://m.youtube.com")
+            }
+
+            btnTikTok.setOnClickListener {
+              playBeep()
+              etUrl.setText("https://www.tiktok.com")
+              loadUrlInActiveBatch("https://www.tiktok.com")
+            }
+
+            btnPlayActive.setOnClickListener {
+              playBeep()
+              var url = etUrl.text.toString().trim()
+              if (url.isEmpty()) {
+                Toast.makeText(this, "Paste Video Link First!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+              }
+              if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "https://$url"
+              }
+              loadUrlInActiveBatch(url)
+            }
+
+            btnReloadActive.setOnClickListener {
+              playBeep()
+              for (i in activeStartIdx..activeEndIdx) {
+                applyProxyForSlot(i)
+                webViews[i]?.reload()
+              }
+              Toast.makeText(this, "Reloaded Devices ${activeStartIdx + 1}-${activeEndIdx + 1}", Toast.LENGTH_SHORT).show()
+            }
+
+            btnWhatsApp.setOnClickListener {
+              playBeep()
               try {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
               } catch (_: Exception) {}
             }
+          }
 
-            btnEnableService.setOnClickListener {
-              it.playSoundEffect(SoundEffectConstants.CLICK)
-              startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            }
-
-            btnSetNum.setOnClickListener {
-              it.playSoundEffect(SoundEffectConstants.CLICK)
-              val num = etStartNum.text.toString().toIntOrNull()
-              if (num != null && num >= 1) {
-                prefs.edit().putInt("kma_num", num).apply()
-                refreshScreen()
-                Toast.makeText(this, "KMA$num Set", Toast.LENGTH_SHORT).show()
+          private fun buildFiftyCardsSkeleton() {
+            val prefs = getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+            for (rowIdx in 0 until 25) {
+              val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                  ViewGroup.LayoutParams.MATCH_PARENT,
+                  550
+                ).apply { setMargins(0, 4, 0, 4) }
               }
+              rowContainers.add(row)
+
+              for (colIdx in 0 until 2) {
+                val idx = rowIdx * 2 + colIdx
+                val defaultName = "${idx + 1}. ${deviceModels[idx]}"
+                val savedName = prefs.getString("name_$idx", defaultName) ?: defaultName
+                val savedIp = prefs.getString("ip_$idx", "Set IP") ?: "Set IP"
+
+                val phoneCard = LinearLayout(this).apply {
+                  orientation = LinearLayout.VERTICAL
+                  setBackgroundResource(R.drawable.bg_phone_frame)
+                  setPadding(6, 6, 6, 6)
+                  layoutParams = LinearLayout.LayoutParams(
+                    0,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    1f
+                  ).apply { setMargins(4, 0, 4, 0) }
+                }
+
+                val header = LinearLayout(this).apply {
+                  orientation = LinearLayout.HORIZONTAL
+                  gravity = Gravity.CENTER_VERTICAL
+                  setBackgroundColor(Color.parseColor("#004D40"))
+                  setPadding(6, 2, 6, 2)
+                }
+
+                val tvTitle = TextView(this).apply {
+                  text = savedName
+                  setTextColor(Color.WHITE)
+                  textSize = 11f
+                  layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                  setOnClickListener { promptRenamePhone(idx) }
+                }
+                titleViews.add(tvTitle)
+
+                val btnZoom = TextView(this).apply {
+                  text = " [FULL]"
+                  setTextColor(Color.parseColor("#FFD54F"))
+                  textSize = 11f
+                  setOnClickListener {
+                    playBeep()
+                    toggleExpandPhone(idx)
+                  }
+                }
+
+                header.addView(tvTitle)
+                header.addView(btnZoom)
+
+                val tvIpSub = TextView(this).apply {
+                  text = "IP: ${savedIp.ifEmpty { "Tap to Set IP" }}"
+                  setTextColor(Color.parseColor("#80CBC4"))
+                  setBackgroundColor(Color.parseColor("#1C2833"))
+                  textSize = 9f
+                  setPadding(6, 1, 6, 1)
+                  setOnClickListener { promptSingleIp(idx) }
+                }
+                ipLabels.add(tvIpSub)
+
+                phoneCard.addView(header)
+                phoneCard.addView(tvIpSub)
+                row.addView(phoneCard)
+                cardContainers.add(phoneCard)
+              }
+              gridContainer.addView(row)
             }
+          }
 
-            btnStart.setOnClickListener {
-              it.playSoundEffect(SoundEffectConstants.CLICK)
-              try { toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP, 150) } catch (_: Exception) {}
+          @SuppressLint("SetJavaScriptEnabled")
+          private fun ensureWebViewCreated(idx: Int): WebView {
+            webViews[idx]?.let { return it }
+            applyProxyForSlot(idx)
+            val modelName = deviceModels[idx].replace(" ", "_")
+            val androidVer = 11 + (idx % 4)
+            val chromeBuild = 118 + (idx % 7)
 
-              if (!checkPermissions()) return@setOnClickListener
-              if (!isAccessibilityEnabled()) {
-                Toast.makeText(this, "Enable AKS DAILER Service First!", Toast.LENGTH_LONG).show()
-                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                return@setOnClickListener
+            val wv = WebView(this).apply {
+              layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                0,
+                1f
+              )
+              settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+                databaseEnabled = true
+                mediaPlaybackRequiresUserGesture = false
+                loadWithOverviewMode = true
+                useWideViewPort = true
+                userAgentString = "Mozilla/5.0 (Linux; Android $androidVer; $modelName) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$chromeBuild.0.0.0 Mobile Safari/537.36"
               }
 
-              val simSlot = if (rbSim1.isChecked) 0 else 1
-              val startNum = etStartNum.text.toString().toIntOrNull() ?: prefs.getInt("kma_num", 9200)
-              val existingCnic = prefs.getString("saved_cnic", "") ?: ""
+              if (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
+                try {
+                  WebViewCompat.setProfile(this, "AKS_Device_Profile_${idx + 1}")
+                } catch (_: Exception) {}
+              }
 
-              prefs.edit()
-                .putBoolean("is_running", true)
-                .putInt("selected_sim", simSlot)
-                .putInt("kma_num", startNum)
-                .apply()
+              val cm = CookieManager.getInstance()
+              cm.setAcceptCookie(true)
+              cm.setAcceptThirdPartyCookies(this, true)
 
-              if (existingCnic.length == 13) {
-                prefs.edit().putString("status_text", "Using Copied CNIC -> Sending KMA$startNum...").apply()
-                refreshScreen()
-                SmsLoopEngine.sendNextSms(this)
+              webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean = false
+                override fun onPageFinished(view: WebView?, url: String?) {
+                  super.onPageFinished(view, url)
+                  view?.evaluateJavascript(
+                    "document.querySelectorAll('video').forEach(v => { v.play(); });",
+                    null
+                  )
+                }
+              }
+              webChromeClient = WebChromeClient()
+              loadUrl("https://m.youtube.com")
+            }
+            webViews[idx] = wv
+            cardContainers[idx].addView(wv)
+            return wv
+          }
+
+          private fun applyProxyForSlot(idx: Int) {
+            val prefs = getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+            val proxyAddr = prefs.getString("ip_$idx", "") ?: ""
+            if (proxyAddr.contains(":") && WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE)) {
+              try {
+                val proxyConfig = ProxyConfig.Builder()
+                  .addProxyRule(proxyAddr.trim())
+                  .addDirect()
+                  .build()
+                ProxyController.getInstance().setProxyOverride(proxyConfig, { it.run() }, {})
+              } catch (_: Exception) {}
+            }
+          }
+
+          private fun showBulkIpDialog() {
+            val prefs = getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+            val sb = StringBuilder()
+            for (i in 0 until totalPhones) {
+              val ip = prefs.getString("ip_$i", "") ?: ""
+              if (ip.isNotEmpty()) sb.append(ip).append("\n")
+            }
+            val input = EditText(this).apply {
+              hint = "Paste 50 Unique Proxy IPs (1 per line, e.g. 103.25.44.12:8080)"
+              minLines = 8
+              maxLines = 12
+              setText(sb.toString())
+            }
+            AlertDialog.Builder(this)
+              .setTitle("Assign 50 Separate IPs")
+              .setView(input)
+              .setPositiveButton("Save All IPs") { _, _ ->
+                val lines = input.text.toString().lines().map { it.trim() }.filter { it.isNotEmpty() }
+                val editor = prefs.edit()
+                for (i in 0 until totalPhones) {
+                  val assigned = if (i < lines.size) lines[i] else ""
+                  editor.putString("ip_$i", assigned)
+                  ipLabels[i].text = "IP: ${assigned.ifEmpty { "Tap to Set IP" }}"
+                }
+                editor.apply()
+                Toast.makeText(this, "Saved ${lines.size} Separate IPs!", Toast.LENGTH_SHORT).show()
+              }
+              .setNegativeButton("Cancel", null)
+              .show()
+          }
+
+          private fun promptSingleIp(idx: Int) {
+            val prefs = getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+            val input = EditText(this).apply {
+              hint = "e.g. 103.45.12.8:8080"
+              setText(prefs.getString("ip_$idx", ""))
+            }
+            AlertDialog.Builder(this)
+              .setTitle("Set IP for ${titleViews[idx].text}")
+              .setView(input)
+              .setPositiveButton("Save") { _, _ ->
+                val ip = input.text.toString().trim()
+                prefs.edit().putString("ip_$idx", ip).apply()
+                ipLabels[idx].text = "IP: ${ip.ifEmpty { "Tap to Set IP" }}"
+                applyProxyForSlot(idx)
+                webViews[idx]?.reload()
+              }
+              .setNegativeButton("Cancel", null)
+              .show()
+          }
+
+          private fun showBatch(startIdx: Int, endIdx: Int) {
+            expandedIndex = -1
+            activeStartIdx = startIdx
+            activeEndIdx = endIdx
+
+            for (r in rowContainers.indices) {
+              val rowStart = r * 2
+              val rowEnd = rowStart + 1
+              if (rowEnd >= startIdx && rowStart <= endIdx) {
+                rowContainers[r].visibility = View.VISIBLE
+                rowContainers[r].layoutParams = LinearLayout.LayoutParams(
+                  ViewGroup.LayoutParams.MATCH_PARENT,
+                  550
+                ).apply { setMargins(0, 4, 0, 4) }
               } else {
-                prefs.edit()
-                  .putBoolean("waiting_for_ussd", true)
-                  .putString("status_text", "Dialing *336*1*2# Once to Copy CNIC...")
-                  .apply()
-                refreshScreen()
-                dialUssdOnce("*336*1*2#", simSlot)
+                rowContainers[r].visibility = View.GONE
               }
             }
 
-            btnStop.setOnClickListener {
-              it.playSoundEffect(SoundEffectConstants.CLICK)
-              try { toneGen?.startTone(ToneGenerator.TONE_PROP_NACK, 250) } catch (_: Exception) {}
-              SmsLoopEngine.cancelPending()
-              prefs.edit()
-                .putBoolean("is_running", false)
-                .putBoolean("waiting_for_ussd", false)
-                .putString("status_text", "Status: Stopped")
-                .apply()
-              refreshScreen()
-            }
-
-            btnResetReport.setOnClickListener {
-              it.playSoundEffect(SoundEffectConstants.CLICK)
-              SmsLoopEngine.cancelPending()
-              prefs.edit()
-                .putBoolean("is_running", false)
-                .putBoolean("waiting_for_ussd", false)
-                .putString("saved_cnic", "")
-                .putString("live_history", "")
-                .putString("last_sent_text", "SENDING: ---")
-                .putString("last_received_text", "RECEIVED (9771): ---")
-                .putInt("sent_count", 0)
-                .putString("status_text", "Status: Ready")
-                .apply()
-              refreshScreen()
-            }
-          }
-
-          override fun onResume() {
-            super.onResume()
-            refreshScreen()
-          }
-
-          private fun refreshScreen() {
-            val active = isAccessibilityEnabled()
-            cardService.visibility = if (active) View.GONE else View.VISIBLE
-
-            val kma = prefs.getInt("kma_num", 9200)
-            tvActiveKma.text = "KMA$kma"
-            if (!etStartNum.hasFocus()) {
-              etStartNum.setText(kma.toString())
-            }
-
-            val cnic = prefs.getString("saved_cnic", "") ?: ""
-            tvCopiedCnic.text = if (cnic.isEmpty()) "CNIC: Not Copied" else "CNIC: $cnic"
-            tvCountSent.text = "Count: ${prefs.getInt("sent_count", 0)}"
-            tvStatus.text = prefs.getString("status_text", "Status: Ready")
-            tvSendingBox.text = prefs.getString("last_sent_text", "SENDING: ---")
-            tvReceivingBox.text = prefs.getString("last_received_text", "RECEIVED (9771): ---")
-            val rep = prefs.getString("live_history", "") ?: ""
-            tvReport.text = if (rep.isEmpty()) "Live History:\n" else rep
-          }
-
-          private fun dialUssdOnce(ussd: String, simSlot: Int) {
-            try {
-              if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
-                  ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-                checkPermissions()
-                return
+            for (i in 0 until totalPhones) {
+              if (i in startIdx..endIdx) {
+                cardContainers[i].visibility = View.VISIBLE
+                ensureWebViewCreated(i)
+              } else {
+                cardContainers[i].visibility = View.GONE
               }
-              val encodedUssd = ussd.replace("#", Uri.encode("#"))
-              val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$encodedUssd"))
-              val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-              val accounts: List<PhoneAccountHandle> = telecomManager.callCapablePhoneAccounts
-              if (accounts.isNotEmpty() && simSlot < accounts.size) {
-                callIntent.putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, accounts[simSlot])
+            }
+            Toast.makeText(this, "Devices ${startIdx + 1} to ${endIdx + 1} Active", Toast.LENGTH_SHORT).show()
+          }
+
+          private fun toggleExpandPhone(targetIndex: Int) {
+            if (expandedIndex == targetIndex) {
+              showBatch(activeStartIdx, activeEndIdx)
+            } else {
+              expandedIndex = targetIndex
+              ensureWebViewCreated(targetIndex)
+              val targetRow = targetIndex / 2
+              for (r in rowContainers.indices) {
+                if (r == targetRow) {
+                  rowContainers[r].visibility = View.VISIBLE
+                  rowContainers[r].layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    1400
+                  )
+                } else {
+                  rowContainers[r].visibility = View.GONE
+                }
               }
-              startActivity(callIntent)
-            } catch (e: Exception) {
-              Toast.makeText(this, "Dial Error: ${e.message}", Toast.LENGTH_LONG).show()
+              for (c in 0 until totalPhones) {
+                cardContainers[c].visibility = if (c == targetIndex) View.VISIBLE else View.GONE
+              }
             }
           }
 
-          private fun isAccessibilityEnabled(): Boolean {
-            val expected = ComponentName(this, UssdReaderService::class.java).flattenToString()
-            val enabled = Settings.Secure.getString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
-            val splitter = TextUtils.SimpleStringSplitter(':')
-            splitter.setString(enabled)
-            while (splitter.hasNext()) {
-              if (splitter.next().equals(expected, ignoreCase = true)) return true
+          private fun loadUrlInActiveBatch(url: String) {
+            var delay = 0L
+            for (i in activeStartIdx..activeEndIdx) {
+              val wv = ensureWebViewCreated(i)
+              wv.postDelayed({
+                applyProxyForSlot(i)
+                wv.loadUrl(url)
+              }, delay)
+              delay += 250L
             }
-            return false
+            Toast.makeText(this, "Running on Devices ${activeStartIdx + 1}-${activeEndIdx + 1}", Toast.LENGTH_SHORT).show()
           }
 
-          private fun checkPermissions(): Boolean {
-            val perms = arrayOf(
-              Manifest.permission.CALL_PHONE,
-              Manifest.permission.READ_PHONE_STATE,
-              Manifest.permission.SEND_SMS,
-              Manifest.permission.RECEIVE_SMS,
-              Manifest.permission.READ_SMS
-            )
-            val needed = perms.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
-            return if (needed.isNotEmpty()) {
-              ActivityCompat.requestPermissions(this, needed.toTypedArray(), 108)
-              false
-            } else true
+          private fun promptRenamePhone(idx: Int) {
+            val input = EditText(this).apply {
+              setText(titleViews[idx].text.toString())
+            }
+            AlertDialog.Builder(this)
+              .setTitle("Rename Device ${idx + 1}")
+              .setView(input)
+              .setPositiveButton("Save") { _, _ ->
+                val newName = input.text.toString().trim().ifEmpty { "${idx + 1}. ${deviceModels[idx]}" }
+                titleViews[idx].text = newName
+                getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+                  .edit().putString("name_$idx", newName).apply()
+              }
+              .setNegativeButton("Cancel", null)
+              .show()
+          }
+
+          private fun playBeep() {
+            try { toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP, 120) } catch (_: Exception) {}
           }
 
           override fun onDestroy() {
             super.onDestroy()
-            unregisterReceiver(uiReceiver)
             toneGen?.release()
           }
         }
         EOF
 
-        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/values/strings.xml app/src/main/res/xml/accessibility_service_config.xml app/src/main/res/drawable/bg_3d_header.xml app/src/main/res/drawable/bg_3d_card.xml app/src/main/res/drawable/bg_3d_btn_start.xml app/src/main/res/drawable/bg_3d_btn_stop.xml app/src/main/res/drawable/ic_petrol_pump_3d.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/dailer/SmsLoopEngine.kt app/src/main/java/com/aks/dailer/UssdReaderService.kt app/src/main/java/com/aks/dailer/SmsReplyReceiver.kt app/src/main/java/com/aks/dailer/MainActivity.kt
+        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/values/strings.xml app/src/main/res/drawable/bg_phone_frame.xml app/src/main/res/drawable/bg_3d_btn.xml app/src/main/res/drawable/ic_aks_devices.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/multi50/MainActivity.kt
 
     - name: Build Debug APK
       run: gradle assembleDebug --no-daemon
@@ -1026,5 +743,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: AKS-DAILER-3D-APK
+        name: AKS-50X-Devices-APK
         path: app/build/outputs/apk/debug/app-debug.apk

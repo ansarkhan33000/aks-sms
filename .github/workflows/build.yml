@@ -25,7 +25,7 @@ jobs:
 
     - name: Generate AKS DAILER Project
       run: |
-        mkdir -p app/src/main/java/com/aks/dailer app/src/main/res/layout app/src/main/res/drawable app/src/main/res/xml
+        mkdir -p app/src/main/java/com/aks/dailer app/src/main/res/layout app/src/main/res/drawable app/src/main/res/xml app/src/main/res/values
 
         cat << 'EOF' > settings.gradle.kts
         pluginManagement {
@@ -81,6 +81,14 @@ jobs:
           implementation("androidx.appcompat:appcompat:1.6.1")
           implementation("com.google.android.material:material:1.11.0")
         }
+        EOF
+
+        cat << 'EOF' > app/src/main/res/values/strings.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <resources>
+          <string name="app_name">AKS DAILER</string>
+          <string name="acc_desc">AKS DAILER Auto USSD Reader and Loop Controller</string>
+        </resources>
         EOF
 
         cat << 'EOF' > app/src/main/res/xml/accessibility_service_config.xml
@@ -236,7 +244,7 @@ jobs:
             android:allowBackup="true"
             android:icon="@drawable/ic_aks_dailer_logo"
             android:roundIcon="@drawable/ic_aks_dailer_logo"
-            android:label="AKS DAILER"
+            android:label="@string/app_name"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
             <activity android:name=".MainActivity" android:exported="true">
               <intent-filter>
@@ -261,7 +269,6 @@ jobs:
               </intent-filter>
             </receiver>
           </application>
-          <string name="acc_desc">AKS DAILER Auto USSD Reader &amp; Loop Controller</string>
         </manifest>
         EOF
 
@@ -278,7 +285,6 @@ jobs:
             android:orientation="vertical"
             android:padding="15dp">
 
-            <!-- 3D Header -->
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -317,7 +323,6 @@ jobs:
                 android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Accessibility Service Bar -->
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -348,7 +353,6 @@ jobs:
                 android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- SIM Selection & Active KMA Display (Rest Hidden) -->
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -438,7 +442,6 @@ jobs:
               </LinearLayout>
             </LinearLayout>
 
-            <!-- START / STOP Buttons -->
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -471,7 +474,6 @@ jobs:
                 android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Counting Report Card -->
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -547,7 +549,6 @@ jobs:
                 android:textColor="#FFFFFF" />
             </LinearLayout>
 
-            <!-- WhatsApp Contact -->
             <androidx.appcompat.widget.AppCompatButton
               android:id="@+id/btnWhatsApp"
               android:layout_width="match_parent"
@@ -689,7 +690,6 @@ jobs:
                 ToneGenerator(AudioManager.STREAM_NOTIFICATION, 95).startTone(ToneGenerator.TONE_PROP_BEEP, 200)
               } catch (_: Exception) {}
 
-              // Fallback auto-continue if 9771 doesn't reply within 15 seconds
               retryHandler.removeCallbacksAndMessages(null)
               retryHandler.postDelayed({
                 val p = getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
@@ -820,6 +820,7 @@ jobs:
         import android.media.AudioManager
         import android.media.ToneGenerator
         import android.net.Uri
+        import android.os.Build
         import android.os.Bundle
         import android.provider.Settings
         import android.text.TextUtils
@@ -873,7 +874,11 @@ jobs:
             etStartNum = findViewById(R.id.etStartNum)
 
             checkPermissions()
-            registerReceiver(uiReceiver, IntentFilter("com.aks.dailer.UI_UPDATE"))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+              registerReceiver(uiReceiver, IntentFilter("com.aks.dailer.UI_UPDATE"), Context.RECEIVER_NOT_EXPORTED)
+            } else {
+              registerReceiver(uiReceiver, IntentFilter("com.aks.dailer.UI_UPDATE"))
+            }
 
             btnEnableService.setOnClickListener {
               it.playSoundEffect(SoundEffectConstants.CLICK)
@@ -1012,7 +1017,7 @@ jobs:
         }
         EOF
 
-        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/xml/accessibility_service_config.xml app/src/main/res/drawable/bg_3d_header.xml app/src/main/res/drawable/bg_3d_card.xml app/src/main/res/drawable/bg_3d_btn_start.xml app/src/main/res/drawable/bg_3d_btn_stop.xml app/src/main/res/drawable/bg_3d_btn_whatsapp.xml app/src/main/res/drawable/ic_aks_dailer_logo.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/dailer/AutoLoopHelper.kt app/src/main/java/com/aks/dailer/UssdReaderService.kt app/src/main/java/com/aks/dailer/SmsReplyReceiver.kt app/src/main/java/com/aks/dailer/MainActivity.kt
+        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/values/strings.xml app/src/main/res/xml/accessibility_service_config.xml app/src/main/res/drawable/bg_3d_header.xml app/src/main/res/drawable/bg_3d_card.xml app/src/main/res/drawable/bg_3d_btn_start.xml app/src/main/res/drawable/bg_3d_btn_stop.xml app/src/main/res/drawable/bg_3d_btn_whatsapp.xml app/src/main/res/drawable/ic_aks_dailer_logo.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/dailer/AutoLoopHelper.kt app/src/main/java/com/aks/dailer/UssdReaderService.kt app/src/main/java/com/aks/dailer/SmsReplyReceiver.kt app/src/main/java/com/aks/dailer/MainActivity.kt
 
     - name: Build Debug APK
       run: gradle assembleDebug --no-daemon

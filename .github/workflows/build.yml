@@ -391,4 +391,640 @@ jobs:
                 <TextView
                   android:id="@+id/tvActiveKma"
                   android:layout_width="match_parent"
-                  android:layout_height="wrap_
+                  android:layout_height="wrap_content"
+                  android:text="KMA9200"
+                  android:textSize="32sp"
+                  android:textStyle="bold"
+                  android:textColor="#00695C"
+                  android:background="#E0F2F1"
+                  android:padding="10dp"
+                  android:gravity="center"
+                  android:layout_marginBottom="8dp" />
+
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:gravity="center_vertical">
+                  <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Start KMA: "
+                    android:textStyle="bold"
+                    android:textColor="#263238" />
+                  <EditText
+                    android:id="@+id/etStartNum"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:text="9200"
+                    android:textStyle="bold"
+                    android:gravity="center" />
+                  <Button
+                    android:id="@+id/btnSetNum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Set"
+                    android:backgroundTint="#00695C"
+                    android:textColor="#FFFFFF" />
+                </LinearLayout>
+              </LinearLayout>
+
+              <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                  android:id="@+id/btnStart"
+                  android:layout_width="0dp"
+                  android:layout_height="64dp"
+                  android:layout_weight="2"
+                  android:background="@drawable/bg_3d_btn_start"
+                  android:elevation="10dp"
+                  android:text="START"
+                  android:textColor="#FFFFFF"
+                  android:textSize="20sp"
+                  android:textStyle="bold" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                  android:id="@+id/btnStop"
+                  android:layout_width="0dp"
+                  android:layout_height="64dp"
+                  android:layout_weight="1"
+                  android:layout_marginStart="10dp"
+                  android:background="@drawable/bg_3d_btn_stop"
+                  android:elevation="10dp"
+                  android:text="STOP"
+                  android:textColor="#FFFFFF"
+                  android:textSize="18sp"
+                  android:textStyle="bold" />
+              </LinearLayout>
+
+              <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_3d_card"
+                android:elevation="8dp"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:paddingBottom="6dp">
+                  <TextView
+                    android:id="@+id/tvCopiedCnic"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="CNIC: ---"
+                    android:textStyle="bold"
+                    android:textColor="#004D40" />
+                  <TextView
+                    android:id="@+id/tvCountSent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Count: 0"
+                    android:textStyle="bold"
+                    android:textColor="#1B5E20" />
+                </LinearLayout>
+
+                <TextView
+                  android:id="@+id/tvStatus"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="Status: Ready"
+                  android:textStyle="bold"
+                  android:textSize="14sp"
+                  android:textColor="#E65100"
+                  android:paddingBottom="6dp" />
+
+                <TextView
+                  android:id="@+id/tvSendingBox"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:background="#E8F5E9"
+                  android:padding="10dp"
+                  android:text="SENDING: ---"
+                  android:textStyle="bold"
+                  android:textColor="#1B5E20"
+                  android:textSize="13sp"
+                  android:layout_marginBottom="8dp" />
+
+                <TextView
+                  android:id="@+id/tvReceivingBox"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:background="#FFF8E1"
+                  android:padding="10dp"
+                  android:text="RECEIVED (9771): ---"
+                  android:textStyle="bold"
+                  android:textColor="#BF360C"
+                  android:textSize="14sp"
+                  android:layout_marginBottom="8dp" />
+
+                <TextView
+                  android:id="@+id/tvReport"
+                  android:layout_width="match_parent"
+                  android:layout_height="170dp"
+                  android:background="#F5F7FA"
+                  android:padding="10dp"
+                  android:text="Live History:\n"
+                  android:textSize="12sp"
+                  android:textColor="#263238"
+                  android:textIsSelectable="true" />
+
+                <Button
+                  android:id="@+id/btnResetReport"
+                  android:layout_width="match_parent"
+                  android:layout_height="42dp"
+                  android:layout_marginTop="8dp"
+                  android:text="Reset All"
+                  android:backgroundTint="#455A64"
+                  android:textColor="#FFFFFF" />
+              </LinearLayout>
+
+            </LinearLayout>
+          </ScrollView>
+        </LinearLayout>
+        EOF
+
+        cat << 'EOF' > app/src/main/java/com/aks/dailer/SmsLoopEngine.kt
+        package com.aks.dailer
+
+        import android.content.Context
+        import android.content.Intent
+        import android.media.AudioManager
+        import android.media.ToneGenerator
+        import android.os.Build
+        import android.os.Handler
+        import android.os.Looper
+        import android.telephony.SmsManager
+        import android.telephony.SubscriptionManager
+        import java.text.SimpleDateFormat
+        import java.util.*
+
+        object SmsLoopEngine {
+
+          private val fallbackHandler = Handler(Looper.getMainLooper())
+
+          fun sendNextSms(context: Context) {
+            val prefs = context.getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
+            if (!prefs.getBoolean("is_running", false)) return
+
+            val cnic = prefs.getString("saved_cnic", "") ?: ""
+            if (cnic.length != 13) return
+
+            val currentNum = prefs.getInt("kma_num", 9200)
+            val simSlot = prefs.getInt("selected_sim", 0)
+            val smsText = "REG $cnic KMA$currentNum S 03102018"
+            val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
+            try {
+              val subManager = context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+              val subList = subManager.activeSubscriptionInfoList
+              val subId = if (!subList.isNullOrEmpty() && simSlot < subList.size) {
+                subList[simSlot].subscriptionId
+              } else {
+                SubscriptionManager.getDefaultSmsSubscriptionId()
+              }
+              val smsManager = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                context.getSystemService(SmsManager::class.java).createForSubscriptionId(subId)
+              } else {
+                @Suppress("DEPRECATION")
+                SmsManager.getSmsManagerForSubscriptionId(subId)
+              }
+              smsManager.sendTextMessage("9771", null, smsText, null, null)
+
+              val sentCount = prefs.getInt("sent_count", 0) + 1
+              val nextNum = currentNum + 1
+
+              prefs.edit()
+                .putInt("kma_num", nextNum)
+                .putInt("sent_count", sentCount)
+                .putString("last_sent_text", "SENDING (#$sentCount): $smsText")
+                .putString("status_text", "Sent KMA$currentNum -> Waiting Reply...")
+                .apply()
+
+              appendHistory(context, "[$timeStr] SENT: $smsText")
+
+              try {
+                ToneGenerator(AudioManager.STREAM_NOTIFICATION, 95).startTone(ToneGenerator.TONE_PROP_BEEP, 180)
+              } catch (_: Exception) {}
+
+              fallbackHandler.removeCallbacksAndMessages(null)
+              fallbackHandler.postDelayed({
+                val p = context.getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
+                if (p.getBoolean("is_running", false)) {
+                  appendHistory(context, "No reply in 12s -> Next KMA${p.getInt("kma_num", 9200)}")
+                  sendNextSms(context)
+                }
+              }, 12000L)
+
+            } catch (e: Exception) {
+              appendHistory(context, "SMS Error: ${e.message}")
+            }
+          }
+
+          fun cancelPending() {
+            fallbackHandler.removeCallbacksAndMessages(null)
+          }
+
+          fun appendHistory(context: Context, line: String) {
+            val prefs = context.getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
+            val old = prefs.getString("live_history", "") ?: ""
+            prefs.edit().putString("live_history", "$line\n$old").apply()
+            context.sendBroadcast(Intent("com.aks.dailer.UI_UPDATE"))
+          }
+        }
+        EOF
+
+        cat << 'EOF' > app/src/main/java/com/aks/dailer/UssdReaderService.kt
+        package com.aks.dailer
+
+        import android.accessibilityservice.AccessibilityService
+        import android.content.*
+        import android.media.AudioManager
+        import android.media.ToneGenerator
+        import android.view.accessibility.AccessibilityEvent
+        import android.view.accessibility.AccessibilityNodeInfo
+
+        class UssdReaderService : AccessibilityService() {
+
+          override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+            val prefs = getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
+            if (!prefs.getBoolean("is_running", false)) return
+            if (!prefs.getBoolean("waiting_for_ussd", false)) return
+
+            val rootNode = rootInActiveWindow ?: return
+            val allText = StringBuilder()
+            collectText(rootNode, allText)
+            val cleanDigits = allText.toString().replace("-", "")
+            val match = Regex("\\b\\d{13}\\b").find(cleanDigits)
+
+            if (match != null) {
+              val cnic = match.value
+              prefs.edit()
+                .putBoolean("waiting_for_ussd", false)
+                .putString("saved_cnic", cnic)
+                .apply()
+
+              val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+              clipboard.setPrimaryClip(ClipData.newPlainText("CNIC", cnic))
+
+              clickDismissButton(rootNode)
+
+              try {
+                ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100).startTone(ToneGenerator.TONE_PROP_ACK, 250)
+              } catch (_: Exception) {}
+
+              SmsLoopEngine.appendHistory(this, "CNIC Copied Once: $cnic")
+              SmsLoopEngine.sendNextSms(this)
+            }
+          }
+
+          private fun collectText(node: AccessibilityNodeInfo?, sb: StringBuilder) {
+            if (node == null) return
+            if (node.text != null) sb.append(node.text).append(" ")
+            for (i in 0 until node.childCount) collectText(node.getChild(i), sb)
+          }
+
+          private fun clickDismissButton(node: AccessibilityNodeInfo?) {
+            if (node == null) return
+            val labels = listOf("OK", "Cancel", "Dismiss", "Close", "ٹھیک ہے")
+            for (label in labels) {
+              val nodes = node.findAccessibilityNodeInfosByText(label)
+              for (n in nodes) {
+                if (n.isClickable) {
+                  n.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                  return
+                }
+              }
+            }
+          }
+
+          override fun onInterrupt() {}
+        }
+        EOF
+
+        cat << 'EOF' > app/src/main/java/com/aks/dailer/SmsReplyReceiver.kt
+        package com.aks.dailer
+
+        import android.content.BroadcastReceiver
+        import android.content.Context
+        import android.content.Intent
+        import android.media.AudioManager
+        import android.media.ToneGenerator
+        import android.os.Handler
+        import android.os.Looper
+        import android.provider.Telephony
+        import java.text.SimpleDateFormat
+        import java.util.*
+
+        class SmsReplyReceiver : BroadcastReceiver() {
+          override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
+            val prefs = context.getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
+            if (!prefs.getBoolean("is_running", false)) return
+
+            val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+            for (msg in messages) {
+              val sender = msg.originatingAddress ?: ""
+              if (sender.contains("9771") || sender.contains("7991")) {
+                SmsLoopEngine.cancelPending()
+                val rawBody = msg.messageBody ?: ""
+                val lowerBody = rawBody.lowercase(Locale.getDefault())
+                val timeStr = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
+
+                prefs.edit().putString("last_received_text", "RECEIVED (9771): $rawBody").apply()
+                SmsLoopEngine.appendHistory(context, "[$timeStr] REPLY: $rawBody")
+
+                val isKamyab = lowerBody.contains("کامیاب") ||
+                               lowerBody.contains("مبارک") ||
+                               lowerBody.contains("تصدیق") ||
+                               lowerBody.contains("success") ||
+                               lowerBody.contains("kamyab") ||
+                               lowerBody.contains("registered") ||
+                               lowerBody.contains("approved")
+
+                if (isKamyab) {
+                  prefs.edit()
+                    .putBoolean("is_running", false)
+                    .putString("status_text", "کامیاب! (KAMYAB MESSAGE RECEIVED)")
+                    .apply()
+
+                  SmsLoopEngine.appendHistory(context, "*** کامیاب میسج آ گیا! پروسیس مکمل ***")
+                  try {
+                    ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100).startTone(ToneGenerator.TONE_PROP_ACK, 600)
+                  } catch (_: Exception) {}
+                } else {
+                  val nextKma = prefs.getInt("kma_num", 9200)
+                  prefs.edit().putString("status_text", "کامیاب نہیں ہوا -> اگلا KMA$nextKma جا رہا ہے...").apply()
+                  Handler(Looper.getMainLooper()).postDelayed({
+                    SmsLoopEngine.sendNextSms(context)
+                  }, 1500L)
+                }
+              }
+            }
+          }
+        }
+        EOF
+
+        cat << 'EOF' > app/src/main/java/com/aks/dailer/MainActivity.kt
+        package com.aks.dailer
+
+        import android.Manifest
+        import android.content.*
+        import android.content.pm.PackageManager
+        import android.media.AudioManager
+        import android.media.ToneGenerator
+        import android.net.Uri
+        import android.os.Build
+        import android.os.Bundle
+        import android.provider.Settings
+        import android.telecom.PhoneAccountHandle
+        import android.telecom.TelecomManager
+        import android.text.TextUtils
+        import android.view.SoundEffectConstants
+        import android.view.View
+        import android.widget.*
+        import androidx.appcompat.app.AppCompatActivity
+        import androidx.core.app.ActivityCompat
+        import androidx.core.content.ContextCompat
+
+        class MainActivity : AppCompatActivity() {
+
+          private lateinit var cardService: LinearLayout
+          private lateinit var tvServiceStatus: TextView
+          private lateinit var tvActiveKma: TextView
+          private lateinit var tvCopiedCnic: TextView
+          private lateinit var tvCountSent: TextView
+          private lateinit var tvStatus: TextView
+          private lateinit var tvSendingBox: TextView
+          private lateinit var tvReceivingBox: TextView
+          private lateinit var tvReport: TextView
+          private lateinit var etStartNum: EditText
+          private lateinit var prefs: SharedPreferences
+          private var toneGen: ToneGenerator? = null
+
+          private val uiReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+              refreshScreen()
+            }
+          }
+
+          override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.activity_main)
+
+            try {
+              toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 95)
+            } catch (_: Exception) {}
+
+            prefs = getSharedPreferences("AKS_DAILER_PREFS", Context.MODE_PRIVATE)
+            val tvWhatsAppTicker = findViewById<TextView>(R.id.tvWhatsAppTicker)
+            tvWhatsAppTicker.isSelected = true
+
+            cardService = findViewById(R.id.cardService)
+            tvServiceStatus = findViewById(R.id.tvServiceStatus)
+            tvActiveKma = findViewById(R.id.tvActiveKma)
+            tvCopiedCnic = findViewById(R.id.tvCopiedCnic)
+            tvCountSent = findViewById(R.id.tvCountSent)
+            tvStatus = findViewById(R.id.tvStatus)
+            tvSendingBox = findViewById(R.id.tvSendingBox)
+            tvReceivingBox = findViewById(R.id.tvReceivingBox)
+            tvReport = findViewById(R.id.tvReport)
+            etStartNum = findViewById(R.id.etStartNum)
+
+            val rbSim1 = findViewById<RadioButton>(R.id.rbSim1)
+            val btnEnableService = findViewById<Button>(R.id.btnEnableService)
+            val btnSetNum = findViewById<Button>(R.id.btnSetNum)
+            val btnStart = findViewById<Button>(R.id.btnStart)
+            val btnStop = findViewById<Button>(R.id.btnStop)
+            val btnResetReport = findViewById<Button>(R.id.btnResetReport)
+
+            checkPermissions()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+              registerReceiver(uiReceiver, IntentFilter("com.aks.dailer.UI_UPDATE"), Context.RECEIVER_NOT_EXPORTED)
+            } else {
+              registerReceiver(uiReceiver, IntentFilter("com.aks.dailer.UI_UPDATE"))
+            }
+
+            tvWhatsAppTicker.setOnClickListener {
+              try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
+              } catch (_: Exception) {}
+            }
+
+            btnEnableService.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            }
+
+            btnSetNum.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              val num = etStartNum.text.toString().toIntOrNull()
+              if (num != null && num >= 1) {
+                prefs.edit().putInt("kma_num", num).apply()
+                refreshScreen()
+                Toast.makeText(this, "KMA$num Set", Toast.LENGTH_SHORT).show()
+              }
+            }
+
+            btnStart.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              try { toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP, 150) } catch (_: Exception) {}
+
+              if (!checkPermissions()) return@setOnClickListener
+              if (!isAccessibilityEnabled()) {
+                Toast.makeText(this, "Enable AKS DAILER Service First!", Toast.LENGTH_LONG).show()
+                startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                return@setOnClickListener
+              }
+
+              val simSlot = if (rbSim1.isChecked) 0 else 1
+              val startNum = etStartNum.text.toString().toIntOrNull() ?: prefs.getInt("kma_num", 9200)
+              val existingCnic = prefs.getString("saved_cnic", "") ?: ""
+
+              prefs.edit()
+                .putBoolean("is_running", true)
+                .putInt("selected_sim", simSlot)
+                .putInt("kma_num", startNum)
+                .apply()
+
+              if (existingCnic.length == 13) {
+                prefs.edit().putString("status_text", "Using Copied CNIC -> Sending KMA$startNum...").apply()
+                refreshScreen()
+                SmsLoopEngine.sendNextSms(this)
+              } else {
+                prefs.edit()
+                  .putBoolean("waiting_for_ussd", true)
+                  .putString("status_text", "Dialing *336*1*2# Once to Copy CNIC...")
+                  .apply()
+                refreshScreen()
+                dialUssdOnce("*336*1*2#", simSlot)
+              }
+            }
+
+            btnStop.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              try { toneGen?.startTone(ToneGenerator.TONE_PROP_NACK, 250) } catch (_: Exception) {}
+              SmsLoopEngine.cancelPending()
+              prefs.edit()
+                .putBoolean("is_running", false)
+                .putBoolean("waiting_for_ussd", false)
+                .putString("status_text", "Status: Stopped")
+                .apply()
+              refreshScreen()
+            }
+
+            btnResetReport.setOnClickListener {
+              it.playSoundEffect(SoundEffectConstants.CLICK)
+              SmsLoopEngine.cancelPending()
+              prefs.edit()
+                .putBoolean("is_running", false)
+                .putBoolean("waiting_for_ussd", false)
+                .putString("saved_cnic", "")
+                .putString("live_history", "")
+                .putString("last_sent_text", "SENDING: ---")
+                .putString("last_received_text", "RECEIVED (9771): ---")
+                .putInt("sent_count", 0)
+                .putString("status_text", "Status: Ready")
+                .apply()
+              refreshScreen()
+            }
+          }
+
+          override fun onResume() {
+            super.onResume()
+            refreshScreen()
+          }
+
+          private fun refreshScreen() {
+            val active = isAccessibilityEnabled()
+            cardService.visibility = if (active) View.GONE else View.VISIBLE
+
+            val kma = prefs.getInt("kma_num", 9200)
+            tvActiveKma.text = "KMA$kma"
+            if (!etStartNum.hasFocus()) {
+              etStartNum.setText(kma.toString())
+            }
+
+            val cnic = prefs.getString("saved_cnic", "") ?: ""
+            tvCopiedCnic.text = if (cnic.isEmpty()) "CNIC: Not Copied" else "CNIC: $cnic"
+            tvCountSent.text = "Count: ${prefs.getInt("sent_count", 0)}"
+            tvStatus.text = prefs.getString("status_text", "Status: Ready")
+            tvSendingBox.text = prefs.getString("last_sent_text", "SENDING: ---")
+            tvReceivingBox.text = prefs.getString("last_received_text", "RECEIVED (9771): ---")
+            val rep = prefs.getString("live_history", "") ?: ""
+            tvReport.text = if (rep.isEmpty()) "Live History:\n" else rep
+          }
+
+          private fun dialUssdOnce(ussd: String, simSlot: Int) {
+            try {
+              if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ||
+                  ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                checkPermissions()
+                return
+              }
+              val encodedUssd = ussd.replace("#", Uri.encode("#"))
+              val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$encodedUssd"))
+              val telecomManager = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+              val accounts: List<PhoneAccountHandle> = telecomManager.callCapablePhoneAccounts
+              if (accounts.isNotEmpty() && simSlot < accounts.size) {
+                callIntent.putExtra(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, accounts[simSlot])
+              }
+              startActivity(callIntent)
+            } catch (e: Exception) {
+              Toast.makeText(this, "Dial Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+          }
+
+          private fun isAccessibilityEnabled(): Boolean {
+            val expected = ComponentName(this, UssdReaderService::class.java).flattenToString()
+            val enabled = Settings.Secure.getString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES) ?: return false
+            val splitter = TextUtils.SimpleStringSplitter(':')
+            splitter.setString(enabled)
+            while (splitter.hasNext()) {
+              if (splitter.next().equals(expected, ignoreCase = true)) return true
+            }
+            return false
+          }
+
+          private fun checkPermissions(): Boolean {
+            val perms = arrayOf(
+              Manifest.permission.CALL_PHONE,
+              Manifest.permission.READ_PHONE_STATE,
+              Manifest.permission.SEND_SMS,
+              Manifest.permission.RECEIVE_SMS,
+              Manifest.permission.READ_SMS
+            )
+            val needed = perms.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+            return if (needed.isNotEmpty()) {
+              ActivityCompat.requestPermissions(this, needed.toTypedArray(), 108)
+              false
+            } else true
+          }
+
+          override fun onDestroy() {
+            super.onDestroy()
+            unregisterReceiver(uiReceiver)
+            toneGen?.release()
+          }
+        }
+        EOF
+
+        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/values/strings.xml app/src/main/res/xml/accessibility_service_config.xml app/src/main/res/drawable/bg_3d_header.xml app/src/main/res/drawable/bg_3d_card.xml app/src/main/res/drawable/bg_3d_btn_start.xml app/src/main/res/drawable/bg_3d_btn_stop.xml app/src/main/res/drawable/ic_petrol_pump_3d.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/dailer/SmsLoopEngine.kt app/src/main/java/com/aks/dailer/UssdReaderService.kt app/src/main/java/com/aks/dailer/SmsReplyReceiver.kt app/src/main/java/com/aks/dailer/MainActivity.kt
+
+    - name: Build Debug APK
+      run: gradle assembleDebug --no-daemon
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: AKS-DAILER-3D-APK
+        path: app/build/outputs/apk/debug/app-debug.apk

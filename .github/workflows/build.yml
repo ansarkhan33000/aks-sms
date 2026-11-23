@@ -1,4 +1,4 @@
-name: Build AKS 50X Unique Devices APK
+name: Build AKS ONLINE 100 Mobiles APK
 
 on:
   push:
@@ -23,9 +23,9 @@ jobs:
       with:
         gradle-version: '8.4'
 
-    - name: Generate AKS 50X Unique Devices Project
+    - name: Generate AKS ONLINE 100 Project
       run: |
-        mkdir -p app/src/main/java/com/aks/multi50 app/src/main/res/layout app/src/main/res/drawable app/src/main/res/values
+        mkdir -p app/src/main/java/com/aks/online100 app/src/main/res/layout app/src/main/res/drawable app/src/main/res/values
 
         cat << 'EOF' > settings.gradle.kts
         pluginManagement {
@@ -35,7 +35,7 @@ jobs:
           repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
           repositories { google(); mavenCentral() }
         }
-        rootProject.name = "AKS_50X_Devices"
+        rootProject.name = "AKS_ONLINE"
         include(":app")
         EOF
 
@@ -58,10 +58,10 @@ jobs:
           id("org.jetbrains.kotlin.android")
         }
         android {
-          namespace = "com.aks.multi50"
+          namespace = "com.aks.online100"
           compileSdk = 34
           defaultConfig {
-            applicationId = "com.aks.multi50"
+            applicationId = "com.aks.online100"
             minSdk = 28
             targetSdk = 34
             versionCode = 1
@@ -87,7 +87,7 @@ jobs:
         cat << 'EOF' > app/src/main/res/values/strings.xml
         <?xml version="1.0" encoding="utf-8"?>
         <resources>
-          <string name="app_name">AKS 50X Devices</string>
+          <string name="app_name">AKS ONLINE</string>
         </resources>
         EOF
 
@@ -105,7 +105,7 @@ jobs:
         <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
           <item android:top="3dp">
             <shape android:shape="rectangle">
-              <solid android:color="#00332C" />
+              <solid android:color="#00251A" />
               <corners android:radius="10dp" />
             </shape>
           </item>
@@ -118,15 +118,17 @@ jobs:
         </layer-list>
         EOF
 
-        cat << 'EOF' > app/src/main/res/drawable/ic_aks_devices.xml
+        cat << 'EOF' > app/src/main/res/drawable/ic_aks_online.xml
         <?xml version="1.0" encoding="utf-8"?>
         <vector xmlns:android="http://schemas.android.com/apk/res/android"
           android:width="108dp"
           android:height="108dp"
           android:viewportWidth="108"
           android:viewportHeight="108">
-          <path android:fillColor="#004D40" android:pathData="M14,8 L94,8 Q102,8 102,16 L102,92 Q102,100 94,100 L14,100 Q6,100 6,92 L6,16 Q6,8 14,8 Z" />
-          <path android:fillColor="#FFFFFF" android:pathData="M42,32 L76,54 L42,76 Z" />
+          <path android:fillColor="#00251A" android:pathData="M14,14 L94,14 Q102,14 102,22 L102,94 Q102,102 94,102 L14,102 Q6,102 6,94 L6,22 Q6,14 14,14 Z" />
+          <path android:fillColor="#00695C" android:pathData="M14,8 L94,8 Q102,8 102,16 L102,88 Q102,96 94,96 L14,96 Q6,96 6,88 L6,16 Q6,8 14,8 Z" />
+          <path android:fillColor="#FFD54F" android:pathData="M54,24 A28,28 0 1,0 54,80 A28,28 0 1,0 54,24 Z" />
+          <path android:fillColor="#004D40" android:pathData="M46,38 L70,52 L46,66 Z" />
         </vector>
         EOF
 
@@ -138,8 +140,8 @@ jobs:
           <application
             android:allowBackup="true"
             android:hardwareAccelerated="true"
-            android:icon="@drawable/ic_aks_devices"
-            android:roundIcon="@drawable/ic_aks_devices"
+            android:icon="@drawable/ic_aks_online"
+            android:roundIcon="@drawable/ic_aks_online"
             android:label="@string/app_name"
             android:usesCleartextTraffic="true"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
@@ -164,12 +166,33 @@ jobs:
           android:orientation="vertical"
           android:background="#0B131E">
 
+          <!-- Running Contact Strip (Marquee) -->
+          <TextView
+            android:id="@+id/tvContactTicker"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="#1B5E20"
+            android:textColor="#FFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:scrollHorizontally="true"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:text="   Contact Now WhatsApp: 03333997576   |   AKS ONLINE 100 Mobiles Control Panel   |   Contact Now: 03333997576   " />
+
+          <!-- Master Control Panel -->
           <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="#004D40"
-            android:padding="8dp">
+            android:padding="7dp">
 
             <LinearLayout
               android:layout_width="match_parent"
@@ -182,7 +205,7 @@ jobs:
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="AKS 50X DEVICES"
+                android:text="AKS ONLINE (1-100)"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:textSize="14sp" />
@@ -190,8 +213,8 @@ jobs:
               <Button
                 android:id="@+id/btnBulkIp"
                 android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="50 IPs"
+                android:layout_height="32dp"
+                android:text="100 IPs"
                 android:textSize="10sp"
                 android:backgroundTint="#FF8F00"
                 android:textColor="#FFFFFF"
@@ -200,7 +223,7 @@ jobs:
               <Button
                 android:id="@+id/btnGmail"
                 android:layout_width="wrap_content"
-                android:layout_height="34dp"
+                android:layout_height="32dp"
                 android:text="Gmail"
                 android:textSize="10sp"
                 android:backgroundTint="#1976D2"
@@ -210,7 +233,7 @@ jobs:
               <Button
                 android:id="@+id/btnYouTube"
                 android:layout_width="wrap_content"
-                android:layout_height="34dp"
+                android:layout_height="32dp"
                 android:text="YT"
                 android:textSize="10sp"
                 android:backgroundTint="#D32F2F"
@@ -220,41 +243,37 @@ jobs:
               <Button
                 android:id="@+id/btnTikTok"
                 android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="TikTok"
+                android:layout_height="32dp"
+                android:text="TT"
                 android:textSize="10sp"
                 android:backgroundTint="#111111"
                 android:textColor="#FFFFFF"
                 android:layout_marginEnd="3dp" />
 
               <Button
-                android:id="@+id/btnWhatsApp"
+                android:id="@+id/btnFacebook"
                 android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="WA"
+                android:layout_height="32dp"
+                android:text="FB"
                 android:textSize="10sp"
-                android:backgroundTint="#2E7D32"
+                android:backgroundTint="#0D47A1"
                 android:textColor="#FFFFFF" />
             </LinearLayout>
 
+            <!-- 100 Mobiles Batch Selector (1-10 to 91-100 & ALL 100) -->
             <HorizontalScrollView
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:scrollbars="none"
               android:paddingBottom="4dp">
               <LinearLayout
+                android:id="@+id/batchBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <Button android:id="@+id/btnBatch1" android:layout_width="wrap_content" android:layout_height="34dp" android:text="1-10" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnBatch2" android:layout_width="wrap_content" android:layout_height="34dp" android:text="11-20" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnBatch3" android:layout_width="wrap_content" android:layout_height="34dp" android:text="21-30" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnBatch4" android:layout_width="wrap_content" android:layout_height="34dp" android:text="31-40" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnBatch5" android:layout_width="wrap_content" android:layout_height="34dp" android:text="41-50" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnBatchAll" android:layout_width="wrap_content" android:layout_height="34dp" android:text="ALL 50" android:textSize="11sp" android:backgroundTint="#E65100" android:textColor="#FFFFFF"/>
-              </LinearLayout>
+                android:orientation="horizontal" />
             </HorizontalScrollView>
 
+            <!-- Master URL & Command Bar -->
             <LinearLayout
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -264,10 +283,10 @@ jobs:
               <EditText
                 android:id="@+id/etUrl"
                 android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="38dp"
                 android:layout_weight="1"
                 android:background="#FFFFFF"
-                android:hint="Paste Video Link (YouTube / TikTok)..."
+                android:hint="Paste YouTube / TikTok / Facebook Link..."
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
                 android:singleLine="true"
@@ -277,7 +296,7 @@ jobs:
               <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnPlayActive"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="38dp"
                 android:layout_marginStart="6dp"
                 android:background="@drawable/bg_3d_btn"
                 android:paddingStart="12dp"
@@ -289,8 +308,8 @@ jobs:
 
               <Button
                 android:id="@+id/btnReloadActive"
-                android:layout_width="42dp"
-                android:layout_height="40dp"
+                android:layout_width="40dp"
+                android:layout_height="38dp"
                 android:layout_marginStart="4dp"
                 android:text="↻"
                 android:textSize="15sp"
@@ -299,6 +318,7 @@ jobs:
             </LinearLayout>
           </LinearLayout>
 
+          <!-- 100 Virtual Mobiles Grid -->
           <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -315,8 +335,8 @@ jobs:
         </LinearLayout>
         EOF
 
-        cat << 'EOF' > app/src/main/java/com/aks/multi50/MainActivity.kt
-        package com.aks.multi50
+        cat << 'EOF' > app/src/main/java/com/aks/online100/MainActivity.kt
+        package com.aks.online100
 
         import android.annotation.SuppressLint
         import android.app.AlertDialog
@@ -340,7 +360,7 @@ jobs:
 
         class MainActivity : AppCompatActivity() {
 
-          private val totalPhones = 50
+          private val totalPhones = 100
           private val webViews = arrayOfNulls<WebView>(totalPhones)
           private val cardContainers = mutableListOf<LinearLayout>()
           private val rowContainers = mutableListOf<LinearLayout>()
@@ -352,17 +372,11 @@ jobs:
           private var toneGen: ToneGenerator? = null
           private lateinit var gridContainer: LinearLayout
 
-          private val deviceModels = listOf(
-            "Galaxy S24", "Vivo V29", "Oppo Reno11", "Xiaomi 14", "Pixel 8",
-            "Realme 12", "OnePlus 12", "Infinix Note30", "Tecno Camon20", "Redmi Note13",
-            "Galaxy A54", "Vivo Y100", "Oppo F25", "Poco X6", "Pixel 7a",
-            "Realme C67", "OnePlus Nord3", "Infinix Zero30", "Tecno Spark20", "Redmi 13C",
-            "Galaxy S23", "Vivo X100", "Oppo FindX7", "Xiaomi 13T", "Pixel 8 Pro",
-            "Realme GT5", "OnePlus 11R", "Infinix Hot40", "Tecno Pova5", "Poco F5",
-            "Galaxy M34", "Vivo T2 Pro", "Oppo A79", "Redmi Note12", "Pixel 6a",
-            "Realme Narzo60", "OnePlus Ace3", "Infinix Smart8", "Tecno PhantomX2", "Xiaomi 12Pro",
-            "Galaxy ZFlip5", "Vivo V27", "Oppo K11", "Poco M6", "Pixel 7",
-            "Realme 11Pro", "OnePlus 10T", "Infinix GT10", "Tecno Camon30", "Galaxy A35"
+          private val brandPool = listOf(
+            "Galaxy S24", "Vivo V30", "Oppo Reno12", "Xiaomi 14", "Pixel 8 Pro",
+            "Realme 12+", "OnePlus 12", "Infinix Note40", "Tecno Camon30", "Redmi Note13",
+            "Galaxy A55", "Vivo Y200", "Oppo F27", "Poco X6 Pro", "Pixel 8a",
+            "Realme GT6", "OnePlus Nord4", "Infinix Zero30", "Tecno Spark20", "Redmi 13C"
           )
 
           override fun onCreate(savedInstanceState: Bundle?) {
@@ -373,6 +387,15 @@ jobs:
               toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 90)
             } catch (_: Exception) {}
 
+            val tvContactTicker = findViewById<TextView>(R.id.tvContactTicker)
+            tvContactTicker.isSelected = true
+            tvContactTicker.setOnClickListener {
+              playBeep()
+              try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
+              } catch (_: Exception) {}
+            }
+
             val etUrl = findViewById<EditText>(R.id.etUrl)
             val btnPlayActive = findViewById<Button>(R.id.btnPlayActive)
             val btnReloadActive = findViewById<Button>(R.id.btnReloadActive)
@@ -380,18 +403,13 @@ jobs:
             val btnGmail = findViewById<Button>(R.id.btnGmail)
             val btnYouTube = findViewById<Button>(R.id.btnYouTube)
             val btnTikTok = findViewById<Button>(R.id.btnTikTok)
-            val btnWhatsApp = findViewById<Button>(R.id.btnWhatsApp)
+            val btnFacebook = findViewById<Button>(R.id.btnFacebook)
+            val batchBar = findViewById<LinearLayout>(R.id.batchBar)
             gridContainer = findViewById(R.id.gridContainer)
 
-            buildFiftyCardsSkeleton()
+            buildBatchButtons(batchBar)
+            buildHundredCardsSkeleton()
             showBatch(0, 9)
-
-            findViewById<Button>(R.id.btnBatch1).setOnClickListener { playBeep(); showBatch(0, 9) }
-            findViewById<Button>(R.id.btnBatch2).setOnClickListener { playBeep(); showBatch(10, 19) }
-            findViewById<Button>(R.id.btnBatch3).setOnClickListener { playBeep(); showBatch(20, 29) }
-            findViewById<Button>(R.id.btnBatch4).setOnClickListener { playBeep(); showBatch(30, 39) }
-            findViewById<Button>(R.id.btnBatch5).setOnClickListener { playBeep(); showBatch(40, 49) }
-            findViewById<Button>(R.id.btnBatchAll).setOnClickListener { playBeep(); showBatch(0, 49) }
 
             btnBulkIp.setOnClickListener {
               playBeep()
@@ -416,11 +434,17 @@ jobs:
               loadUrlInActiveBatch("https://www.tiktok.com")
             }
 
+            btnFacebook.setOnClickListener {
+              playBeep()
+              etUrl.setText("https://m.facebook.com")
+              loadUrlInActiveBatch("https://m.facebook.com")
+            }
+
             btnPlayActive.setOnClickListener {
               playBeep()
               var url = etUrl.text.toString().trim()
               if (url.isEmpty()) {
-                Toast.makeText(this, "Paste Video Link First!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Paste Video/Post Link First!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
               }
               if (!url.startsWith("http://") && !url.startsWith("https://")) {
@@ -435,34 +459,64 @@ jobs:
                 applyProxyForSlot(i)
                 webViews[i]?.reload()
               }
-              Toast.makeText(this, "Reloaded Devices ${activeStartIdx + 1}-${activeEndIdx + 1}", Toast.LENGTH_SHORT).show()
-            }
-
-            btnWhatsApp.setOnClickListener {
-              playBeep()
-              try {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
-              } catch (_: Exception) {}
+              Toast.makeText(this, "Reloaded Mobiles ${activeStartIdx + 1}-${activeEndIdx + 1}", Toast.LENGTH_SHORT).show()
             }
           }
 
-          private fun buildFiftyCardsSkeleton() {
-            val prefs = getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
-            for (rowIdx in 0 until 25) {
+          private fun buildBatchButtons(batchBar: LinearLayout) {
+            for (b in 0 until 10) {
+              val start = b * 10
+              val end = start + 9
+              val btn = Button(this).apply {
+                text = "${start + 1}-${end + 1}"
+                textSize = 10f
+                setTextColor(Color.WHITE)
+                setBackgroundColor(Color.parseColor("#00796B"))
+                layoutParams = LinearLayout.LayoutParams(
+                  ViewGroup.LayoutParams.WRAP_CONTENT,
+                  84
+                ).apply { setMargins(0, 0, 8, 0) }
+                setOnClickListener {
+                  playBeep()
+                  showBatch(start, end)
+                }
+              }
+              batchBar.addView(btn)
+            }
+            val btnAll = Button(this).apply {
+              text = "ALL 100"
+              textSize = 10f
+              setTextColor(Color.WHITE)
+              setBackgroundColor(Color.parseColor("#E65100"))
+              layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                84
+              )
+              setOnClickListener {
+                playBeep()
+                showBatch(0, 99)
+              }
+            }
+            batchBar.addView(btnAll)
+          }
+
+          private fun buildHundredCardsSkeleton() {
+            val prefs = getSharedPreferences("AKS_ONLINE_100_PREFS", Context.MODE_PRIVATE)
+            for (rowIdx in 0 until 50) {
               val row = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 layoutParams = LinearLayout.LayoutParams(
                   ViewGroup.LayoutParams.MATCH_PARENT,
-                  550
+                  560
                 ).apply { setMargins(0, 4, 0, 4) }
               }
               rowContainers.add(row)
 
               for (colIdx in 0 until 2) {
                 val idx = rowIdx * 2 + colIdx
-                val defaultName = "${idx + 1}. ${deviceModels[idx]}"
-                val savedName = prefs.getString("name_$idx", defaultName) ?: defaultName
-                val savedIp = prefs.getString("ip_$idx", "Set IP") ?: "Set IP"
+                val defaultModel = "${idx + 1}. ${brandPool[idx % brandPool.size]}_M${idx + 1}"
+                val savedName = prefs.getString("name_$idx", defaultModel) ?: defaultModel
+                val savedIp = prefs.getString("ip_$idx", "") ?: ""
 
                 val phoneCard = LinearLayout(this).apply {
                   orientation = LinearLayout.VERTICAL
@@ -485,7 +539,7 @@ jobs:
                 val tvTitle = TextView(this).apply {
                   text = savedName
                   setTextColor(Color.WHITE)
-                  textSize = 11f
+                  textSize = 10f
                   layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
                   setOnClickListener { promptRenamePhone(idx) }
                 }
@@ -514,8 +568,36 @@ jobs:
                 }
                 ipLabels.add(tvIpSub)
 
+                // Quick Built-in App Bar inside every Mobile (YT | TT | FB | Gmail)
+                val miniAppBar = LinearLayout(this).apply {
+                  orientation = LinearLayout.HORIZONTAL
+                  setBackgroundColor(Color.parseColor("#16222F"))
+                  setPadding(2, 2, 2, 2)
+                }
+                val apps = listOf(
+                  "Gmail" to "https://accounts.google.com",
+                  "YT" to "https://m.youtube.com",
+                  "TT" to "https://www.tiktok.com",
+                  "FB" to "https://m.facebook.com"
+                )
+                for ((label, appUrl) in apps) {
+                  val chip = TextView(this).apply {
+                    text = label
+                    setTextColor(Color.WHITE)
+                    textSize = 9f
+                    gravity = Gravity.CENTER
+                    layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
+                    setOnClickListener {
+                      playBeep()
+                      ensureWebViewCreated(idx).loadUrl(appUrl)
+                    }
+                  }
+                  miniAppBar.addView(chip)
+                }
+
                 phoneCard.addView(header)
                 phoneCard.addView(tvIpSub)
+                phoneCard.addView(miniAppBar)
                 row.addView(phoneCard)
                 cardContainers.add(phoneCard)
               }
@@ -527,9 +609,9 @@ jobs:
           private fun ensureWebViewCreated(idx: Int): WebView {
             webViews[idx]?.let { return it }
             applyProxyForSlot(idx)
-            val modelName = deviceModels[idx].replace(" ", "_")
+            val modelTag = brandPool[idx % brandPool.size].replace(" ", "_") + "_ID${idx + 1}"
             val androidVer = 11 + (idx % 4)
-            val chromeBuild = 118 + (idx % 7)
+            val chromeBuild = 118 + (idx % 8)
 
             val wv = WebView(this).apply {
               layoutParams = LinearLayout.LayoutParams(
@@ -544,12 +626,12 @@ jobs:
                 mediaPlaybackRequiresUserGesture = false
                 loadWithOverviewMode = true
                 useWideViewPort = true
-                userAgentString = "Mozilla/5.0 (Linux; Android $androidVer; $modelName) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$chromeBuild.0.0.0 Mobile Safari/537.36"
+                userAgentString = "Mozilla/5.0 (Linux; Android $androidVer; $modelTag) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$chromeBuild.0.0.0 Mobile Safari/537.36"
               }
 
               if (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
                 try {
-                  WebViewCompat.setProfile(this, "AKS_Device_Profile_${idx + 1}")
+                  WebViewCompat.setProfile(this, "AKS_Online_Profile_${idx + 1}")
                 } catch (_: Exception) {}
               }
 
@@ -576,7 +658,7 @@ jobs:
           }
 
           private fun applyProxyForSlot(idx: Int) {
-            val prefs = getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+            val prefs = getSharedPreferences("AKS_ONLINE_100_PREFS", Context.MODE_PRIVATE)
             val proxyAddr = prefs.getString("ip_$idx", "") ?: ""
             if (proxyAddr.contains(":") && WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE)) {
               try {
@@ -590,20 +672,20 @@ jobs:
           }
 
           private fun showBulkIpDialog() {
-            val prefs = getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+            val prefs = getSharedPreferences("AKS_ONLINE_100_PREFS", Context.MODE_PRIVATE)
             val sb = StringBuilder()
             for (i in 0 until totalPhones) {
               val ip = prefs.getString("ip_$i", "") ?: ""
               if (ip.isNotEmpty()) sb.append(ip).append("\n")
             }
             val input = EditText(this).apply {
-              hint = "Paste 50 Unique Proxy IPs (1 per line, e.g. 103.25.44.12:8080)"
+              hint = "Paste up to 100 Unique Proxy IPs (1 per line, e.g. 103.25.44.12:8080)"
               minLines = 8
-              maxLines = 12
+              maxLines = 14
               setText(sb.toString())
             }
             AlertDialog.Builder(this)
-              .setTitle("Assign 50 Separate IPs")
+              .setTitle("Assign 100 Separate IPs")
               .setView(input)
               .setPositiveButton("Save All IPs") { _, _ ->
                 val lines = input.text.toString().lines().map { it.trim() }.filter { it.isNotEmpty() }
@@ -614,14 +696,14 @@ jobs:
                   ipLabels[i].text = "IP: ${assigned.ifEmpty { "Tap to Set IP" }}"
                 }
                 editor.apply()
-                Toast.makeText(this, "Saved ${lines.size} Separate IPs!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Saved ${lines.size} Unique IPs!", Toast.LENGTH_SHORT).show()
               }
               .setNegativeButton("Cancel", null)
               .show()
           }
 
           private fun promptSingleIp(idx: Int) {
-            val prefs = getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+            val prefs = getSharedPreferences("AKS_ONLINE_100_PREFS", Context.MODE_PRIVATE)
             val input = EditText(this).apply {
               hint = "e.g. 103.45.12.8:8080"
               setText(prefs.getString("ip_$idx", ""))
@@ -652,7 +734,7 @@ jobs:
                 rowContainers[r].visibility = View.VISIBLE
                 rowContainers[r].layoutParams = LinearLayout.LayoutParams(
                   ViewGroup.LayoutParams.MATCH_PARENT,
-                  550
+                  560
                 ).apply { setMargins(0, 4, 0, 4) }
               } else {
                 rowContainers[r].visibility = View.GONE
@@ -667,7 +749,7 @@ jobs:
                 cardContainers[i].visibility = View.GONE
               }
             }
-            Toast.makeText(this, "Devices ${startIdx + 1} to ${endIdx + 1} Active", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Mobiles ${startIdx + 1} to ${endIdx + 1} Active", Toast.LENGTH_SHORT).show()
           }
 
           private fun toggleExpandPhone(targetIndex: Int) {
@@ -704,7 +786,7 @@ jobs:
               }, delay)
               delay += 250L
             }
-            Toast.makeText(this, "Running on Devices ${activeStartIdx + 1}-${activeEndIdx + 1}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Playing on Mobiles ${activeStartIdx + 1}-${activeEndIdx + 1}", Toast.LENGTH_SHORT).show()
           }
 
           private fun promptRenamePhone(idx: Int) {
@@ -712,12 +794,12 @@ jobs:
               setText(titleViews[idx].text.toString())
             }
             AlertDialog.Builder(this)
-              .setTitle("Rename Device ${idx + 1}")
+              .setTitle("Rename Mobile ${idx + 1}")
               .setView(input)
               .setPositiveButton("Save") { _, _ ->
-                val newName = input.text.toString().trim().ifEmpty { "${idx + 1}. ${deviceModels[idx]}" }
+                val newName = input.text.toString().trim().ifEmpty { "${idx + 1}. ${brandPool[idx % brandPool.size]}" }
                 titleViews[idx].text = newName
-                getSharedPreferences("AKS_50_DEVICES_PREFS", Context.MODE_PRIVATE)
+                getSharedPreferences("AKS_ONLINE_100_PREFS", Context.MODE_PRIVATE)
                   .edit().putString("name_$idx", newName).apply()
               }
               .setNegativeButton("Cancel", null)
@@ -735,7 +817,7 @@ jobs:
         }
         EOF
 
-        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/values/strings.xml app/src/main/res/drawable/bg_phone_frame.xml app/src/main/res/drawable/bg_3d_btn.xml app/src/main/res/drawable/ic_aks_devices.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/multi50/MainActivity.kt
+        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/values/strings.xml app/src/main/res/drawable/bg_phone_frame.xml app/src/main/res/drawable/bg_3d_btn.xml app/src/main/res/drawable/ic_aks_online.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/online100/MainActivity.kt
 
     - name: Build Debug APK
       run: gradle assembleDebug --no-daemon
@@ -743,5 +825,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: AKS-50X-Devices-APK
+        name: AKS-ONLINE-100-APK
         path: app/build/outputs/apk/debug/app-debug.apk

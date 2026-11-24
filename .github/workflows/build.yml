@@ -1,4 +1,4 @@
-name: Build AKS TikTok 50X Clones APK
+name: Build AKS Call Center APK
 
 on:
   push:
@@ -23,9 +23,9 @@ jobs:
       with:
         gradle-version: '8.4'
 
-    - name: Generate AKS TikTok 50X Project
+    - name: Generate AKS Call Center Project
       run: |
-        mkdir -p app/src/main/java/com/aks/tiktok50 app/src/main/res/layout app/src/main/res/drawable app/src/main/res/values
+        mkdir -p app/src/main/java/com/aks/callcenter app/src/main/res/layout app/src/main/res/drawable app/src/main/res/values
 
         cat << 'EOF' > settings.gradle.kts
         pluginManagement {
@@ -35,7 +35,7 @@ jobs:
           repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
           repositories { google(); mavenCentral() }
         }
-        rootProject.name = "AKS_TikTok_50X"
+        rootProject.name = "AKS_Call_Center"
         include(":app")
         EOF
 
@@ -58,11 +58,11 @@ jobs:
           id("org.jetbrains.kotlin.android")
         }
         android {
-          namespace = "com.aks.tiktok50"
+          namespace = "com.aks.callcenter"
           compileSdk = 34
           defaultConfig {
-            applicationId = "com.aks.tiktok50"
-            minSdk = 28
+            applicationId = "com.aks.callcenter"
+            minSdk = 24
             targetSdk = 34
             versionCode = 1
             versionName = "1.0"
@@ -80,74 +80,70 @@ jobs:
           implementation("androidx.core:core-ktx:1.12.0")
           implementation("androidx.appcompat:appcompat:1.6.1")
           implementation("com.google.android.material:material:1.11.0")
-          implementation("androidx.webkit:webkit:1.10.0")
         }
         EOF
 
         cat << 'EOF' > app/src/main/res/values/strings.xml
         <?xml version="1.0" encoding="utf-8"?>
         <resources>
-          <string name="app_name">AKS TikTok 50X</string>
+          <string name="app_name">AKS Call Center</string>
         </resources>
         EOF
 
-        cat << 'EOF' > app/src/main/res/drawable/bg_clone_frame.xml
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_card.xml
         <?xml version="1.0" encoding="utf-8"?>
         <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-          <solid android:color="#0E1117" />
+          <solid android:color="#121B26" />
           <corners android:radius="14dp" />
-          <stroke android:width="2dp" android:color="#FE2C55" />
+          <stroke android:width="1.5dp" android:color="#00BFA5" />
         </shape>
         EOF
 
-        cat << 'EOF' > app/src/main/res/drawable/bg_3d_play_btn.xml
+        cat << 'EOF' > app/src/main/res/drawable/bg_3d_green_btn.xml
         <?xml version="1.0" encoding="utf-8"?>
         <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
           <item android:top="4dp">
             <shape android:shape="rectangle">
-              <solid android:color="#880E27" />
+              <solid android:color="#004D40" />
               <corners android:radius="12dp" />
             </shape>
           </item>
           <item android:bottom="4dp">
             <shape android:shape="rectangle">
-              <gradient android:startColor="#FE2C55" android:endColor="#D81B60" android:angle="270" />
+              <gradient android:startColor="#00C853" android:endColor="#00897B" android:angle="270" />
               <corners android:radius="12dp" />
-              <stroke android:width="1.5dp" android:color="#25F4EE" />
+              <stroke android:width="1dp" android:color="#69F0AE" />
             </shape>
           </item>
         </layer-list>
         EOF
 
-        cat << 'EOF' > app/src/main/res/drawable/ic_aks_tiktok.xml
+        cat << 'EOF' > app/src/main/res/drawable/ic_aks_call.xml
         <?xml version="1.0" encoding="utf-8"?>
         <vector xmlns:android="http://schemas.android.com/apk/res/android"
           android:width="108dp"
           android:height="108dp"
           android:viewportWidth="108"
           android:viewportHeight="108">
-          <path android:fillColor="#0B0E14" android:pathData="M14,8 L94,8 Q102,8 102,16 L102,92 Q102,100 94,100 L14,100 Q6,100 6,92 L6,16 Q6,8 14,8 Z" />
-          <path android:fillColor="#25F4EE" android:pathData="M40,30 L74,52 L40,74 Z" />
-          <path android:fillColor="#FE2C55" android:pathData="M44,34 L78,56 L44,78 Z" />
+          <path android:fillColor="#004D40" android:pathData="M14,8 L94,8 Q102,8 102,16 L102,92 Q102,100 94,100 L14,100 Q6,100 6,92 L6,16 Q6,8 14,8 Z" />
+          <path android:fillColor="#00E676" android:pathData="M36,30 L48,30 L52,44 L44,50 Q50,62 62,68 L68,60 L82,64 L82,76 Q62,82 42,62 Q24,42 36,30 Z" />
         </vector>
         EOF
 
         cat << 'EOF' > app/src/main/AndroidManifest.xml
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-          <uses-permission android:name="android.permission.INTERNET" />
-          <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+          <uses-permission android:name="android.permission.CALL_PHONE" />
+          <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+          <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
           <application
             android:allowBackup="true"
-            android:hardwareAccelerated="true"
-            android:icon="@drawable/ic_aks_tiktok"
-            android:roundIcon="@drawable/ic_aks_tiktok"
+            android:icon="@drawable/ic_aks_call"
+            android:roundIcon="@drawable/ic_aks_call"
             android:label="@string/app_name"
-            android:usesCleartextTraffic="true"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
             <activity
               android:name=".MainActivity"
-              android:configChanges="orientation|screenSize|keyboardHidden"
               android:exported="true">
               <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -164,13 +160,13 @@ jobs:
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:orientation="vertical"
-          android:background="#090C10">
+          android:background="#090F17">
 
-          <!-- Running Contact Strip -->
+          <!-- Running WhatsApp Contact Strip -->
           <TextView
             android:id="@+id/tvContactTicker"
             android:layout_width="match_parent"
-            android:layout_height="32dp"
+            android:layout_height="34dp"
             android:background="#1B5E20"
             android:textColor="#FFFFFF"
             android:textSize="13sp"
@@ -184,456 +180,379 @@ jobs:
             android:scrollHorizontally="true"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:text="   Contact Now WhatsApp: 03333997576   |   AKS TikTok 50X Clones Controller   |   Contact Now: 03333997576   " />
+            android:text="   Contact Now WhatsApp: 03333997576   |   AKS CALL CENTER - Auto Voice &amp; Dialer   |   Contact Now: 03333997576   " />
 
-          <!-- Easy Master Control Panel -->
-          <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="#121822"
-            android:padding="8dp">
-
-            <LinearLayout
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:gravity="center_vertical"
-              android:paddingBottom="6dp">
-
-              <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="AKS TIKTOK 50 CLONES"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:textSize="15sp" />
-
-              <Button
-                android:id="@+id/btnGmailLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="Gmail Login"
-                android:textSize="10sp"
-                android:backgroundTint="#1976D2"
-                android:textColor="#FFFFFF"
-                android:layout_marginEnd="4dp" />
-
-              <Button
-                android:id="@+id/btnTikTokHome"
-                android:layout_width="wrap_content"
-                android:layout_height="34dp"
-                android:text="TikTok Home"
-                android:textSize="10sp"
-                android:backgroundTint="#FE2C55"
-                android:textColor="#FFFFFF"
-                android:layout_marginEnd="4dp" />
-
-              <Button
-                android:id="@+id/btnReloadAll"
-                android:layout_width="40dp"
-                android:layout_height="34dp"
-                android:text="↻"
-                android:textSize="14sp"
-                android:backgroundTint="#37474F"
-                android:textColor="#FFFFFF" />
-            </LinearLayout>
-
-            <!-- Easy Batch Selector (1-10, 11-20, 21-30, 31-40, 41-50, ALL 50) -->
-            <HorizontalScrollView
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:scrollbars="none"
-              android:paddingBottom="6dp">
-              <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <Button android:id="@+id/btnB1" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Clones 1-10" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnB2" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Clones 11-20" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnB3" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Clones 21-30" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnB4" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Clones 31-40" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnB5" android:layout_width="wrap_content" android:layout_height="34dp" android:text="Clones 41-50" android:textSize="11sp" android:backgroundTint="#00796B" android:textColor="#FFFFFF" android:layout_marginEnd="4dp"/>
-                <Button android:id="@+id/btnBAll" android:layout_width="wrap_content" android:layout_height="34dp" android:text="ALL 50" android:textSize="11sp" android:backgroundTint="#E65100" android:textColor="#FFFFFF"/>
-              </LinearLayout>
-            </HorizontalScrollView>
-
-            <!-- One-Button Views & Video Link Bar -->
-            <LinearLayout
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:gravity="center_vertical">
-
-              <EditText
-                android:id="@+id/etVideoUrl"
-                android:layout_width="0dp"
-                android:layout_height="42dp"
-                android:layout_weight="1"
-                android:background="#FFFFFF"
-                android:hint="Paste TikTok Video Link here..."
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:singleLine="true"
-                android:textColor="#000000"
-                android:textSize="13sp" />
-
-              <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnPlayViews"
-                android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:layout_marginStart="6dp"
-                android:background="@drawable/bg_3d_play_btn"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:text="PLAY VIEWS"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-            </LinearLayout>
-          </LinearLayout>
-
-          <!-- 50 Clones Grid -->
           <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="match_parent">
 
             <LinearLayout
-              android:id="@+id/gridContainer"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
-              android:padding="4dp" />
-          </ScrollView>
+              android:padding="14dp">
 
+              <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="AKS CALL CENTER PRO"
+                android:textColor="#00E676"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:paddingBottom="10dp" />
+
+              <!-- Step 1: Voice Recording Setup -->
+              <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_3d_card"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="1. Auto Voice Recording (MP3 / WAV)"
+                  android:textColor="#69F0AE"
+                  android:textStyle="bold"
+                  android:textSize="15sp" />
+
+                <TextView
+                  android:id="@+id/tvSelectedAudio"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="No Recording Selected"
+                  android:textColor="#B0BEC5"
+                  android:textSize="13sp"
+                  android:paddingTop="6dp"
+                  android:paddingBottom="8dp" />
+
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal">
+
+                  <Button
+                    android:id="@+id/btnPickAudio"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:text="Select Recording"
+                    android:backgroundTint="#1976D2"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="6dp" />
+
+                  <Button
+                    android:id="@+id/btnTestAudio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:text="Test Play"
+                    android:backgroundTint="#00796B"
+                    android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+                <CheckBox
+                  android:id="@+id/cbAutoPlay"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="Auto-Play Recording When Call Connects"
+                  android:textColor="#FFFFFF"
+                  android:checked="true"
+                  android:layout_marginTop="4dp" />
+              </LinearLayout>
+
+              <!-- Step 2: Customer Numbers & Delay -->
+              <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_3d_card"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="2. Customer Numbers List (1 per line)"
+                  android:textColor="#69F0AE"
+                  android:textStyle="bold"
+                  android:textSize="15sp"
+                  android:paddingBottom="6dp" />
+
+                <EditText
+                  android:id="@+id/etNumbers"
+                  android:layout_width="match_parent"
+                  android:layout_height="130dp"
+                  android:background="#1C2833"
+                  android:textColor="#FFFFFF"
+                  android:hint="03001234567&#10;03333997576"
+                  android:textColorHint="#78909C"
+                  android:gravity="top|start"
+                  android:padding="10dp"
+                  android:inputType="textMultiLine"
+                  android:textSize="14sp" />
+
+                <LinearLayout
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="horizontal"
+                  android:gravity="center_vertical"
+                  android:layout_marginTop="8dp">
+
+                  <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Gap Between Calls (Seconds):"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp" />
+
+                  <EditText
+                    android:id="@+id/etDelay"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="#1C2833"
+                    android:textColor="#00E676"
+                    android:text="25"
+                    android:gravity="center"
+                    android:inputType="number" />
+                </LinearLayout>
+              </LinearLayout>
+
+              <!-- Step 3: Live Status & Action Buttons -->
+              <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_3d_card"
+                android:padding="14dp">
+
+                <TextView
+                  android:id="@+id/tvLiveStatus"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="Status: Ready"
+                  android:textColor="#FFD54F"
+                  android:textSize="15sp"
+                  android:textStyle="bold"
+                  android:gravity="center"
+                  android:paddingBottom="10dp" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                  android:id="@+id/btnStartCalls"
+                  android:layout_width="match_parent"
+                  android:layout_height="52dp"
+                  android:background="@drawable/bg_3d_green_btn"
+                  android:text="START AUTO CALLS + VOICE"
+                  android:textColor="#FFFFFF"
+                  android:textSize="15sp"
+                  android:textStyle="bold" />
+
+                <Button
+                  android:id="@+id/btnStopAll"
+                  android:layout_width="match_parent"
+                  android:layout_height="44dp"
+                  android:layout_marginTop="8dp"
+                  android:backgroundTint="#C62828"
+                  android:text="STOP CALLS &amp; VOICE"
+                  android:textColor="#FFFFFF"
+                  android:textStyle="bold" />
+              </LinearLayout>
+
+            </LinearLayout>
+          </ScrollView>
         </LinearLayout>
         EOF
 
-        cat << 'EOF' > app/src/main/java/com/aks/tiktok50/MainActivity.kt
-        package com.aks.tiktok50
+        cat << 'EOF' > app/src/main/java/com/aks/callcenter/MainActivity.kt
+        package com.aks.callcenter
 
-        import android.annotation.SuppressLint
-        import android.app.AlertDialog
+        import android.Manifest
         import android.content.Context
         import android.content.Intent
-        import android.graphics.Color
+        import android.content.pm.PackageManager
         import android.media.AudioManager
-        import android.media.ToneGenerator
+        import android.media.MediaPlayer
         import android.net.Uri
         import android.os.Bundle
-        import android.view.Gravity
-        import android.view.View
-        import android.view.ViewGroup
-        import android.webkit.*
+        import android.os.Handler
+        import android.os.Looper
         import android.widget.*
+        import androidx.activity.result.contract.ActivityResultContracts
         import androidx.appcompat.app.AppCompatActivity
-        import androidx.webkit.WebViewCompat
-        import androidx.webkit.WebViewFeature
+        import androidx.core.app.ActivityCompat
+        import androidx.core.content.ContextCompat
 
         class MainActivity : AppCompatActivity() {
 
-          private val totalClones = 50
-          private val webViews = arrayOfNulls<WebView>(totalClones)
-          private val cardContainers = mutableListOf<LinearLayout>()
-          private val rowContainers = mutableListOf<LinearLayout>()
-          private val titleViews = mutableListOf<TextView>()
-          private var expandedIndex = -1
-          private var activeStartIdx = 0
-          private var activeEndIdx = 9
-          private var toneGen: ToneGenerator? = null
-          private lateinit var gridContainer: LinearLayout
+          private var audioUri: Uri? = null
+          private var mediaPlayer: MediaPlayer? = null
+          private val handler = Handler(Looper.getMainLooper())
+          private var numberQueue = listOf<String>()
+          private var currentIndex = 0
+          private var isRunning = false
 
-          private val phoneNames = listOf(
-            "Galaxy S24", "Vivo V30", "Oppo Reno12", "Xiaomi 14", "Pixel 8",
-            "Realme 12+", "OnePlus 12", "Infinix Note40", "Tecno Camon30", "Redmi Note13",
-            "Galaxy A55", "Vivo Y200", "Oppo F27", "Poco X6", "Pixel 8a",
-            "Realme GT6", "OnePlus Nord4", "Infinix Zero30", "Tecno Spark20", "Redmi 13C",
-            "Galaxy S23", "Vivo X100", "Oppo FindX7", "Xiaomi 13T", "Pixel 7 Pro",
-            "Realme 11Pro", "OnePlus 11R", "Infinix Hot40", "Tecno Pova5", "Poco F5",
-            "Galaxy M34", "Vivo T2 Pro", "Oppo A79", "Redmi Note12", "Pixel 7a",
-            "Realme Narzo60", "OnePlus Ace3", "Infinix Smart8", "Tecno Phantom", "Xiaomi 12Pro",
-            "Galaxy ZFlip5", "Vivo V29", "Oppo K11", "Poco M6", "Pixel 6a",
-            "Realme C67", "OnePlus 10T", "Infinix GT10", "Tecno Camon20", "Galaxy A35"
-          )
+          private lateinit var tvSelectedAudio: TextView
+          private lateinit var tvLiveStatus: TextView
+          private lateinit var etNumbers: EditText
+          private lateinit var etDelay: EditText
+          private lateinit var cbAutoPlay: CheckBox
+
+          private val pickAudioLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) {
+              try {
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+              } catch (_: Exception) {}
+              audioUri = uri
+              tvSelectedAudio.text = "Selected: ${uri.lastPathSegment ?: "Voice Recording"}"
+              Toast.makeText(this, "Recording Loaded!", Toast.LENGTH_SHORT).show()
+            }
+          }
 
           override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.activity_main)
 
-            try {
-              toneGen = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 90)
-            } catch (_: Exception) {}
-
             val tvContactTicker = findViewById<TextView>(R.id.tvContactTicker)
             tvContactTicker.isSelected = true
             tvContactTicker.setOnClickListener {
-              playBeep()
               try {
                 startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
               } catch (_: Exception) {}
             }
 
-            val etVideoUrl = findViewById<EditText>(R.id.etVideoUrl)
-            val btnPlayViews = findViewById<Button>(R.id.btnPlayViews)
-            val btnGmailLogin = findViewById<Button>(R.id.btnGmailLogin)
-            val btnTikTokHome = findViewById<Button>(R.id.btnTikTokHome)
-            val btnReloadAll = findViewById<Button>(R.id.btnReloadAll)
-            gridContainer = findViewById(R.id.gridContainer)
+            tvSelectedAudio = findViewById(R.id.tvSelectedAudio)
+            tvLiveStatus = findViewById(R.id.tvLiveStatus)
+            etNumbers = findViewById(R.id.etNumbers)
+            etDelay = findViewById(R.id.etDelay)
+            cbAutoPlay = findViewById(R.id.cbAutoPlay)
 
-            buildFiftyCloneCards()
-            showBatch(0, 9)
+            requestCallPermission()
 
-            findViewById<Button>(R.id.btnB1).setOnClickListener { playBeep(); showBatch(0, 9) }
-            findViewById<Button>(R.id.btnB2).setOnClickListener { playBeep(); showBatch(10, 19) }
-            findViewById<Button>(R.id.btnB3).setOnClickListener { playBeep(); showBatch(20, 29) }
-            findViewById<Button>(R.id.btnB4).setOnClickListener { playBeep(); showBatch(30, 39) }
-            findViewById<Button>(R.id.btnB5).setOnClickListener { playBeep(); showBatch(40, 49) }
-            findViewById<Button>(R.id.btnBAll).setOnClickListener { playBeep(); showBatch(0, 49) }
-
-            btnGmailLogin.setOnClickListener {
-              playBeep()
-              etVideoUrl.setText("https://accounts.google.com")
-              loadInActiveClones("https://accounts.google.com")
+            findViewById<Button>(R.id.btnPickAudio).setOnClickListener {
+              pickAudioLauncher.launch(arrayOf("audio/*"))
             }
 
-            btnTikTokHome.setOnClickListener {
-              playBeep()
-              etVideoUrl.setText("https://www.tiktok.com")
-              loadInActiveClones("https://www.tiktok.com")
+            findViewById<Button>(R.id.btnTestAudio).setOnClickListener {
+              playRecording()
             }
 
-            btnPlayViews.setOnClickListener {
-              playBeep()
-              var url = etVideoUrl.text.toString().trim()
-              if (url.isEmpty()) {
-                Toast.makeText(this, "Paste TikTok Video Link First!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-              }
-              if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "https://$url"
-              }
-              loadInActiveClones(url)
+            findViewById<Button>(R.id.btnStartCalls).setOnClickListener {
+              startAutoCampaign()
             }
 
-            btnReloadAll.setOnClickListener {
-              playBeep()
-              for (i in activeStartIdx..activeEndIdx) {
-                webViews[i]?.reload()
-              }
-              Toast.makeText(this, "Refreshed Clones ${activeStartIdx + 1}-${activeEndIdx + 1}", Toast.LENGTH_SHORT).show()
+            findViewById<Button>(R.id.btnStopAll).setOnClickListener {
+              stopEverything()
             }
           }
 
-          private fun buildFiftyCloneCards() {
-            val prefs = getSharedPreferences("AKS_TIKTOK_50_PREFS", Context.MODE_PRIVATE)
-            for (rowIdx in 0 until 25) {
-              val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                layoutParams = LinearLayout.LayoutParams(
-                  ViewGroup.LayoutParams.MATCH_PARENT,
-                  550
-                ).apply { setMargins(0, 4, 0, 4) }
-              }
-              rowContainers.add(row)
+          private fun requestCallPermission() {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+              ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.MODIFY_AUDIO_SETTINGS), 101)
+            }
+          }
 
-              for (colIdx in 0 until 2) {
-                val idx = rowIdx * 2 + colIdx
-                val defaultName = "${idx + 1}. ${phoneNames[idx]}"
-                val savedName = prefs.getString("clone_name_$idx", defaultName) ?: defaultName
+          private fun startAutoCampaign() {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+              requestCallPermission()
+              Toast.makeText(this, "Please Allow Phone Call Permission First!", Toast.LENGTH_SHORT).show()
+              return
+            }
 
-                val card = LinearLayout(this).apply {
-                  orientation = LinearLayout.VERTICAL
-                  setBackgroundResource(R.drawable.bg_clone_frame)
-                  setPadding(6, 6, 6, 6)
-                  layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    1f
-                  ).apply { setMargins(4, 0, 4, 0) }
+            val raw = etNumbers.text.toString().lines().map { it.trim() }.filter { it.isNotEmpty() }
+            if (raw.isEmpty()) {
+              Toast.makeText(this, "Enter at least 1 phone number!", Toast.LENGTH_SHORT).show()
+              return
+            }
+
+            numberQueue = raw
+            currentIndex = 0
+            isRunning = true
+            dialNextNumber()
+          }
+
+          private fun dialNextNumber() {
+            if (!isRunning) return
+            if (currentIndex >= numberQueue.size) {
+              isRunning = false
+              tvLiveStatus.text = "Status: All ${numberQueue.size} Calls Completed!"
+              Toast.makeText(this, "All Calls Completed!", Toast.LENGTH_LONG).show()
+              return
+            }
+
+            val targetNum = numberQueue[currentIndex]
+            tvLiveStatus.text = "Calling (${currentIndex + 1}/${numberQueue.size}): $targetNum"
+
+            try {
+              val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$targetNum"))
+              startActivity(callIntent)
+            } catch (e: Exception) {
+              Toast.makeText(this, "Call Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+
+            // Enable Speaker & Auto-Play Recording after 4 seconds so ring/answer connects
+            if (cbAutoPlay.isChecked && audioUri != null) {
+              handler.postDelayed({
+                if (isRunning) {
+                  enableLoudspeaker()
+                  playRecording()
                 }
+              }, 4000L)
+            }
 
-                val header = LinearLayout(this).apply {
-                  orientation = LinearLayout.HORIZONTAL
-                  gravity = Gravity.CENTER_VERTICAL
-                  setBackgroundColor(Color.parseColor("#1F2633"))
-                  setPadding(8, 4, 8, 4)
-                }
+            val gapSec = etDelay.text.toString().toLongOrNull() ?: 25L
+            currentIndex++
+            handler.postDelayed({
+              dialNextNumber()
+            }, gapSec * 1000L)
+          }
 
-                val tvTitle = TextView(this).apply {
-                  text = savedName
-                  setTextColor(Color.WHITE)
-                  textSize = 11f
-                  layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-                  setOnClickListener { promptRenameClone(idx) }
-                }
-                titleViews.add(tvTitle)
+          private fun enableLoudspeaker() {
+            try {
+              val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+              am.mode = AudioManager.MODE_IN_CALL
+              am.isSpeakerphoneOn = true
+            } catch (_: Exception) {}
+          }
 
-                val btnFull = TextView(this).apply {
-                  text = " [FULL] "
-                  setTextColor(Color.parseColor("#25F4EE"))
-                  textSize = 11f
-                  setOnClickListener {
-                    playBeep()
-                    toggleExpandClone(idx)
-                  }
-                }
-
-                header.addView(tvTitle)
-                header.addView(btnFull)
-                card.addView(header)
-                row.addView(card)
-                cardContainers.add(card)
+          private fun playRecording() {
+            val uri = audioUri ?: run {
+              Toast.makeText(this, "Select an Audio Recording First!", Toast.LENGTH_SHORT).show()
+              return
+            }
+            try {
+              mediaPlayer?.release()
+              mediaPlayer = MediaPlayer().apply {
+                setDataSource(applicationContext, uri)
+                prepare()
+                start()
               }
-              gridContainer.addView(row)
+            } catch (e: Exception) {
+              Toast.makeText(this, "Audio Play Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
           }
 
-          @SuppressLint("SetJavaScriptEnabled")
-          private fun ensureCloneReady(idx: Int): WebView {
-            webViews[idx]?.let { return it }
-            val modelTag = phoneNames[idx].replace(" ", "_")
-            val androidVer = 11 + (idx % 4)
-            val chromeVer = 118 + (idx % 7)
-
-            val wv = WebView(this).apply {
-              layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-              )
-              settings.apply {
-                javaScriptEnabled = true
-                domStorageEnabled = true
-                databaseEnabled = true
-                mediaPlaybackRequiresUserGesture = false
-                loadWithOverviewMode = true
-                useWideViewPort = true
-                userAgentString = "Mozilla/5.0 (Linux; Android $androidVer; $modelTag) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/$chromeVer.0.0.0 Mobile Safari/537.36"
-              }
-
-              if (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE)) {
-                try {
-                  WebViewCompat.setProfile(this, "AKS_TT_Clone_${idx + 1}")
-                } catch (_: Exception) {}
-              }
-
-              val cm = CookieManager.getInstance()
-              cm.setAcceptCookie(true)
-              cm.setAcceptThirdPartyCookies(this, true)
-
-              webViewClient = object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean = false
-                override fun onPageFinished(view: WebView?, url: String?) {
-                  super.onPageFinished(view, url)
-                  view?.evaluateJavascript(
-                    "document.querySelectorAll('video').forEach(v => { v.play(); });",
-                    null
-                  )
-                }
-              }
-              webChromeClient = WebChromeClient()
-              loadUrl("https://www.tiktok.com")
-            }
-            webViews[idx] = wv
-            cardContainers[idx].addView(wv)
-            return wv
-          }
-
-          private fun showBatch(startIdx: Int, endIdx: Int) {
-            expandedIndex = -1
-            activeStartIdx = startIdx
-            activeEndIdx = endIdx
-
-            for (r in rowContainers.indices) {
-              val rowStart = r * 2
-              val rowEnd = rowStart + 1
-              if (rowEnd >= startIdx && rowStart <= endIdx) {
-                rowContainers[r].visibility = View.VISIBLE
-                rowContainers[r].layoutParams = LinearLayout.LayoutParams(
-                  ViewGroup.LayoutParams.MATCH_PARENT,
-                  550
-                ).apply { setMargins(0, 4, 0, 4) }
-              } else {
-                rowContainers[r].visibility = View.GONE
-              }
-            }
-
-            for (i in 0 until totalClones) {
-              if (i in startIdx..endIdx) {
-                cardContainers[i].visibility = View.VISIBLE
-                ensureCloneReady(i)
-              } else {
-                cardContainers[i].visibility = View.GONE
-              }
-            }
-            Toast.makeText(this, "Clones ${startIdx + 1} to ${endIdx + 1} Open", Toast.LENGTH_SHORT).show()
-          }
-
-          private fun toggleExpandClone(targetIndex: Int) {
-            if (expandedIndex == targetIndex) {
-              showBatch(activeStartIdx, activeEndIdx)
-            } else {
-              expandedIndex = targetIndex
-              ensureCloneReady(targetIndex)
-              val targetRow = targetIndex / 2
-              for (r in rowContainers.indices) {
-                if (r == targetRow) {
-                  rowContainers[r].visibility = View.VISIBLE
-                  rowContainers[r].layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    1400
-                  )
-                } else {
-                  rowContainers[r].visibility = View.GONE
-                }
-              }
-              for (c in 0 until totalClones) {
-                cardContainers[c].visibility = if (c == targetIndex) View.VISIBLE else View.GONE
-              }
-            }
-          }
-
-          private fun loadInActiveClones(url: String) {
-            var delay = 0L
-            for (i in activeStartIdx..activeEndIdx) {
-              val wv = ensureCloneReady(i)
-              wv.postDelayed({ wv.loadUrl(url) }, delay)
-              delay += 250L
-            }
-            Toast.makeText(this, "Playing Views on Clones ${activeStartIdx + 1}-${activeEndIdx + 1}", Toast.LENGTH_SHORT).show()
-          }
-
-          private fun promptRenameClone(idx: Int) {
-            val input = EditText(this).apply {
-              setText(titleViews[idx].text.toString())
-            }
-            AlertDialog.Builder(this)
-              .setTitle("Rename Clone ${idx + 1}")
-              .setView(input)
-              .setPositiveButton("Save") { _, _ ->
-                val newName = input.text.toString().trim().ifEmpty { "${idx + 1}. ${phoneNames[idx]}" }
-                titleViews[idx].text = newName
-                getSharedPreferences("AKS_TIKTOK_50_PREFS", Context.MODE_PRIVATE)
-                  .edit().putString("clone_name_$idx", newName).apply()
-              }
-              .setNegativeButton("Cancel", null)
-              .show()
-          }
-
-          private fun playBeep() {
-            try { toneGen?.startTone(ToneGenerator.TONE_PROP_BEEP, 120) } catch (_: Exception) {}
+          private fun stopEverything() {
+            isRunning = false
+            handler.removeCallbacksAndMessages(null)
+            try {
+              mediaPlayer?.stop()
+              mediaPlayer?.release()
+              mediaPlayer = null
+            } catch (_: Exception) {}
+            tvLiveStatus.text = "Status: Stopped"
           }
 
           override fun onDestroy() {
             super.onDestroy()
-            toneGen?.release()
+            stopEverything()
           }
         }
         EOF
 
-        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/values/strings.xml app/src/main/res/drawable/bg_clone_frame.xml app/src/main/res/drawable/bg_3d_play_btn.xml app/src/main/res/drawable/ic_aks_tiktok.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/tiktok50/MainActivity.kt
+        sed -i 's/^        //' settings.gradle.kts build.gradle.kts gradle.properties app/build.gradle.kts app/src/main/res/values/strings.xml app/src/main/res/drawable/bg_3d_card.xml app/src/main/res/drawable/bg_3d_green_btn.xml app/src/main/res/drawable/ic_aks_call.xml app/src/main/AndroidManifest.xml app/src/main/res/layout/activity_main.xml app/src/main/java/com/aks/callcenter/MainActivity.kt
 
     - name: Build Debug APK
       run: gradle assembleDebug --no-daemon
@@ -641,5 +560,5 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: AKS-TikTok-50X-APK
+        name: AKS-Call-Center-APK
         path: app/build/outputs/apk/debug/app-debug.apk

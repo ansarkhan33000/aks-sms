@@ -1,507 +1,729 @@
-name: Build AKS Call Center APK
+name: Build AKS All-In-One Auto Call Center APK
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
+  push:
+    branches: [ main, master ]
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: '8.4'
+      - name: Generate Standalone All-In-One Android App
+        run: |
+          mkdir -p app/src/main/java/com/aks/callcenter
+          mkdir -p app/src/main/res/values
 
-    - name: Generate AKS Call Center Project
-      run: |
-        mkdir -p app/src/main/java/com/aks/callcenter app/src/main/res/layout app/src/main/res/drawable app/src/main/res/values
+          cat << 'EOF' > settings.gradle
+          rootProject.name = "AKSAutoCallCenter"
+          include ':app'
+          EOF
 
-        cat << 'EOF' > settings.gradle.kts
-        pluginManagement {
-          repositories { google(); mavenCentral(); gradlePluginPortal() }
-        }
-        dependencyResolutionManagement {
-          repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-          repositories { google(); mavenCentral() }
-        }
-        rootProject.name = "AKS_Call_Center"
-        include(":app")
-        EOF
-
-        cat << 'EOF' > build.gradle.kts
-        plugins {
-          id("com.android.application") version "8.2.2" apply false
-          id("org.jetbrains.kotlin.android") version "1.9.22" apply false
-        }
-        EOF
-
-        cat << 'EOF' > gradle.properties
-        org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-        android.useAndroidX=true
-        kotlin.code.style=official
-        EOF
-
-        cat << 'EOF' > app/build.gradle.kts
-        plugins {
-          id("com.android.application")
-          id("org.jetbrains.kotlin.android")
-        }
-        android {
-          namespace = "com.aks.callcenter"
-          compileSdk = 34
-          defaultConfig {
-            applicationId = "com.aks.callcenter"
-            minSdk = 24
-            targetSdk = 34
-            versionCode = 1
-            versionName = "1.0"
+          cat << 'EOF' > build.gradle
+          buildscript {
+              repositories { google(); mavenCentral() }
+              dependencies { classpath 'com.android.tools.build:gradle:8.2.2' }
           }
-          buildTypes {
-            release { isMinifyEnabled = false }
+          allprojects {
+              repositories { google(); mavenCentral() }
           }
-          compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
+          EOF
+
+          cat << 'EOF' > app/build.gradle
+          plugins { id 'com.android.application' }
+          android {
+              namespace 'com.aks.callcenter'
+              compileSdk 34
+              defaultConfig {
+                  applicationId "com.aks.callcenter"
+                  minSdk 24
+                  targetSdk 34
+                  versionCode 1
+                  versionName "1.0"
+              }
+              buildTypes {
+                  release { minifyEnabled false }
+              }
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
           }
-          kotlinOptions { jvmTarget = "17" }
-        }
-        dependencies {
-          implementation("androidx.core:core-ktx:1.12.0")
-          implementation("androidx.appcompat:appcompat:1.6.1")
-          implementation("com.google.android.material:material:1.11.0")
-        }
-        EOF
-
-        cat << 'EOF' > app/src/main/res/values/strings.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <resources>
-          <string name="app_name">AKS Call Center</string>
-        </resources>
-        EOF
-
-        cat << 'EOF' > app/src/main/res/drawable/bg_3d_card.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-          <solid android:color="#121B26" />
-          <corners android:radius="14dp" />
-          <stroke android:width="1.5dp" android:color="#00BFA5" />
-        </shape>
-        EOF
-
-        cat << 'EOF' > app/src/main/res/drawable/bg_3d_green_btn.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-          <item android:top="4dp">
-            <shape android:shape="rectangle">
-              <solid android:color="#004D40" />
-              <corners android:radius="12dp" />
-            </shape>
-          </item>
-          <item android:bottom="4dp">
-            <shape android:shape="rectangle">
-              <gradient android:startColor="#00C853" android:endColor="#00897B" android:angle="270" />
-              <corners android:radius="12dp" />
-              <stroke android:width="1dp" android:color="#69F0AE" />
-            </shape>
-          </item>
-        </layer-list>
-        EOF
-
-        cat << 'EOF' > app/src/main/res/drawable/ic_aks_call.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <vector xmlns:android="http://schemas.android.com/apk/res/android"
-          android:width="108dp"
-          android:height="108dp"
-          android:viewportWidth="108"
-          android:viewportHeight="108">
-          <path android:fillColor="#004D40" android:pathData="M14,8 L94,8 Q102,8 102,16 L102,92 Q102,100 94,100 L14,100 Q6,100 6,92 L6,16 Q6,8 14,8 Z" />
-          <path android:fillColor="#00E676" android:pathData="M36,30 L48,30 L52,44 L44,50 Q50,62 62,68 L68,60 L82,64 L82,76 Q62,82 42,62 Q24,42 36,30 Z" />
-        </vector>
-        EOF
-
-        cat << 'EOF' > app/src/main/AndroidManifest.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-          <uses-permission android:name="android.permission.CALL_PHONE" />
-          <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-          <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-          <application
-            android:allowBackup="true"
-            android:icon="@drawable/ic_aks_call"
-            android:roundIcon="@drawable/ic_aks_call"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
-            <activity
-              android:name=".MainActivity"
-              android:exported="true">
-              <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-              </intent-filter>
-            </activity>
-          </application>
-        </manifest>
-        EOF
-
-        cat << 'EOF' > app/src/main/res/layout/activity_main.xml
-        <?xml version="1.0" encoding="utf-8"?>
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:orientation="vertical"
-          android:background="#090F17">
-
-          <!-- Running WhatsApp Contact Strip -->
-          <TextView
-            android:id="@+id/tvContactTicker"
-            android:layout_width="match_parent"
-            android:layout_height="34dp"
-            android:background="#1B5E20"
-            android:textColor="#FFFFFF"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:gravity="center_vertical"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:scrollHorizontally="true"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:text="   Contact Now WhatsApp: 03333997576   |   AKS CALL CENTER - Auto Voice &amp; Dialer   |   Contact Now: 03333997576   " />
-
-          <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:padding="14dp">
-
-              <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="AKS CALL CENTER PRO"
-                android:textColor="#00E676"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:paddingBottom="10dp" />
-
-              <!-- Step 1: Voice Recording Setup -->
-              <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_3d_card"
-                android:padding="14dp"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="1. Auto Voice Recording (MP3 / WAV)"
-                  android:textColor="#69F0AE"
-                  android:textStyle="bold"
-                  android:textSize="15sp" />
-
-                <TextView
-                  android:id="@+id/tvSelectedAudio"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="No Recording Selected"
-                  android:textColor="#B0BEC5"
-                  android:textSize="13sp"
-                  android:paddingTop="6dp"
-                  android:paddingBottom="8dp" />
-
-                <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal">
-
-                  <Button
-                    android:id="@+id/btnPickAudio"
-                    android:layout_width="0dp"
-                    android:layout_height="44dp"
-                    android:layout_weight="1"
-                    android:text="Select Recording"
-                    android:backgroundTint="#1976D2"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginEnd="6dp" />
-
-                  <Button
-                    android:id="@+id/btnTestAudio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="44dp"
-                    android:text="Test Play"
-                    android:backgroundTint="#00796B"
-                    android:textColor="#FFFFFF" />
-                </LinearLayout>
-
-                <CheckBox
-                  android:id="@+id/cbAutoPlay"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="Auto-Play Recording When Call Connects"
-                  android:textColor="#FFFFFF"
-                  android:checked="true"
-                  android:layout_marginTop="4dp" />
-              </LinearLayout>
-
-              <!-- Step 2: Customer Numbers & Delay -->
-              <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_3d_card"
-                android:padding="14dp"
-                android:layout_marginBottom="12dp">
-
-                <TextView
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:text="2. Customer Numbers List (1 per line)"
-                  android:textColor="#69F0AE"
-                  android:textStyle="bold"
-                  android:textSize="15sp"
-                  android:paddingBottom="6dp" />
-
-                <EditText
-                  android:id="@+id/etNumbers"
-                  android:layout_width="match_parent"
-                  android:layout_height="130dp"
-                  android:background="#1C2833"
-                  android:textColor="#FFFFFF"
-                  android:hint="03001234567&#10;03333997576"
-                  android:textColorHint="#78909C"
-                  android:gravity="top|start"
-                  android:padding="10dp"
-                  android:inputType="textMultiLine"
-                  android:textSize="14sp" />
-
-                <LinearLayout
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:orientation="horizontal"
-                  android:gravity="center_vertical"
-                  android:layout_marginTop="8dp">
-
-                  <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Gap Between Calls (Seconds):"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp" />
-
-                  <EditText
-                    android:id="@+id/etDelay"
-                    android:layout_width="70dp"
-                    android:layout_height="40dp"
-                    android:background="#1C2833"
-                    android:textColor="#00E676"
-                    android:text="25"
-                    android:gravity="center"
-                    android:inputType="number" />
-                </LinearLayout>
-              </LinearLayout>
-
-              <!-- Step 3: Live Status & Action Buttons -->
-              <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_3d_card"
-                android:padding="14dp">
-
-                <TextView
-                  android:id="@+id/tvLiveStatus"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:text="Status: Ready"
-                  android:textColor="#FFD54F"
-                  android:textSize="15sp"
-                  android:textStyle="bold"
-                  android:gravity="center"
-                  android:paddingBottom="10dp" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                  android:id="@+id/btnStartCalls"
-                  android:layout_width="match_parent"
-                  android:layout_height="52dp"
-                  android:background="@drawable/bg_3d_green_btn"
-                  android:text="START AUTO CALLS + VOICE"
-                  android:textColor="#FFFFFF"
-                  android:textSize="15sp"
-                  android:textStyle="bold" />
-
-                <Button
-                  android:id="@+id/btnStopAll"
-                  android:layout_width="match_parent"
-                  android:layout_height="44dp"
-                  android:layout_marginTop="8dp"
-                  android:backgroundTint="#C62828"
-                  android:text="STOP CALLS &amp; VOICE"
-                  android:textColor="#FFFFFF"
-                  android:textStyle="bold" />
-              </LinearLayout>
-
-            </LinearLayout>
-          </ScrollView>
-        </LinearLayout>
-        EOF
-
-        cat << 'EOF' > app/src/main/java/com/aks/callcenter/MainActivity.kt
-        package com.aks.callcenter
-
-        import android.Manifest
-        import android.content.Context
-        import android.content.Intent
-        import android.content.pm.PackageManager
-        import android.media.AudioManager
-        import android.media.MediaPlayer
-        import android.net.Uri
-        import android.os.Bundle
-        import android.os.Handler
-        import android.os.Looper
-        import android.widget.*
-        import androidx.activity.result.contract.ActivityResultContracts
-        import androidx.appcompat.app.AppCompatActivity
-        import androidx.core.app.ActivityCompat
-        import androidx.core.content.ContextCompat
-
-        class MainActivity : AppCompatActivity() {
-
-          private var audioUri: Uri? = null
-          private var mediaPlayer: MediaPlayer? = null
-          private val handler = Handler(Looper.getMainLooper())
-          private var numberQueue = listOf<String>()
-          private var currentIndex = 0
-          private var isRunning = false
-
-          private lateinit var tvSelectedAudio: TextView
-          private lateinit var tvLiveStatus: TextView
-          private lateinit var etNumbers: EditText
-          private lateinit var etDelay: EditText
-          private lateinit var cbAutoPlay: CheckBox
-
-          private val pickAudioLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            if (uri != null) {
-              try {
-                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-              } catch (_: Exception) {}
-              audioUri = uri
-              tvSelectedAudio.text = "Selected: ${uri.lastPathSegment ?: "Voice Recording"}"
-              Toast.makeText(this, "Recording Loaded!", Toast.LENGTH_SHORT).show()
-            }
+          dependencies {
+              implementation 'androidx.appcompat:appcompat:1.6.1'
           }
+          EOF
 
-          override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_main)
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.CALL_PHONE" />
+              <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+              <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+              <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+              <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+              <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+              <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-            val tvContactTicker = findViewById<TextView>(R.id.tvContactTicker)
-            tvContactTicker.isSelected = true
-            tvContactTicker.setOnClickListener {
-              try {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/923333997576")))
-              } catch (_: Exception) {}
-            }
+              <application
+                  android:label="AKS Auto Call Center"
+                  android:theme="@style/Theme.AppCompat.NoActionBar">
+                  <activity android:name=".MainActivity" android:exported="true" android:screenOrientation="portrait">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
 
-            tvSelectedAudio = findViewById(R.id.tvSelectedAudio)
-            tvLiveStatus = findViewById(R.id.tvLiveStatus)
-            etNumbers = findViewById(R.id.etNumbers)
-            etDelay = findViewById(R.id.etDelay)
-            cbAutoPlay = findViewById(R.id.cbAutoPlay)
+          cat << 'EOF' > app/src/main/java/com/aks/callcenter/MainActivity.java
+          package com.aks.callcenter;
 
-            requestCallPermission()
+          import android.Manifest;
+          import android.app.Activity;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.content.pm.PackageManager;
+          import android.database.Cursor;
+          import android.graphics.Color;
+          import android.graphics.Typeface;
+          import android.graphics.drawable.GradientDrawable;
+          import android.media.AudioManager;
+          import android.media.MediaPlayer;
+          import android.net.Uri;
+          import android.os.Build;
+          import android.os.Bundle;
+          import android.os.Handler;
+          import android.os.Looper;
+          import android.provider.OpenableColumns;
+          import android.telecom.TelecomManager;
+          import android.telephony.PhoneStateListener;
+          import android.telephony.TelephonyManager;
+          import android.text.InputType;
+          import android.view.Gravity;
+          import android.view.WindowManager;
+          import android.widget.*;
+          import androidx.appcompat.app.AppCompatActivity;
+          import androidx.core.app.ActivityCompat;
+          import org.xmlpull.v1.XmlPullParser;
+          import org.xmlpull.v1.XmlPullParserFactory;
+          import java.io.BufferedReader;
+          import java.io.InputStream;
+          import java.io.InputStreamReader;
+          import java.text.SimpleDateFormat;
+          import java.util.*;
+          import java.util.zip.ZipEntry;
+          import java.util.zip.ZipInputStream;
 
-            findViewById<Button>(R.id.btnPickAudio).setOnClickListener {
-              pickAudioLauncher.launch(arrayOf("audio/*"))
-            }
+          public class MainActivity extends AppCompatActivity {
+              private static final int REQ_CONTACTS = 201;
+              private static final int REQ_AUDIO = 202;
 
-            findViewById<Button>(R.id.btnTestAudio).setOnClickListener {
-              playRecording()
-            }
+              static class ContactItem {
+                  String number;
+                  String status = "PENDING";
+                  int duration = 0;
+                  String time = "-";
+                  ContactItem(String n) { this.number = n; }
+              }
 
-            findViewById<Button>(R.id.btnStartCalls).setOnClickListener {
-              startAutoCampaign()
-            }
+              private final List<ContactItem> contacts = new ArrayList<>();
+              private final Set<String> dndSet = new HashSet<>();
+              private Uri selectedAudioUri = null;
 
-            findViewById<Button>(R.id.btnStopAll).setOnClickListener {
-              stopEverything()
-            }
+              private TextView tvTotal, tvCompleted, tvAnswered, tvFailed, tvRemaining, tvProgress;
+              private TextView tvContactsLabel, tvAudioLabel, tvLiveStatus, tvLogBox;
+              private ProgressBar progressBar;
+              private EditText etDelay, etDndInput, etManualNumbers;
+              private CheckBox cbDuplicates;
+              private Button btnStart, btnPause, btnStop;
+
+              private boolean isRunning = false;
+              private boolean isPaused = false;
+              private int currentIndex = -1;
+              private long offhookTime = 0;
+              private boolean wasOffhook = false;
+              private MediaPlayer mediaPlayer;
+              private final Handler handler = new Handler(Looper.getMainLooper());
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+                  ScrollView scroll = new ScrollView(this);
+                  scroll.setBackgroundColor(Color.parseColor("#060D1A"));
+
+                  LinearLayout root = new LinearLayout(this);
+                  root.setOrientation(LinearLayout.VERTICAL);
+                  root.setPadding(36, 40, 36, 60);
+                  scroll.addView(root);
+
+                  // Header
+                  LinearLayout header = new LinearLayout(this);
+                  header.setOrientation(LinearLayout.VERTICAL);
+                  header.setPadding(30, 30, 30, 30);
+                  header.setBackground(makeCard("#0F2342", "#00E5FF"));
+                  TextView title = new TextView(this);
+                  title.setText("AKS AUTO CALL CENTER");
+                  title.setTextColor(Color.parseColor("#00E5FF"));
+                  title.setTextSize(22);
+                  title.setTypeface(null, Typeface.BOLD);
+                  TextView sub = new TextView(this);
+                  sub.setText("100% Standalone Android SIM Marketing & IVR System");
+                  sub.setTextColor(Color.parseColor("#9BB0D3"));
+                  sub.setTextSize(12);
+                  header.addView(title);
+                  header.addView(sub);
+                  root.addView(header);
+
+                  // Stats Row
+                  LinearLayout statsRow = new LinearLayout(this);
+                  statsRow.setOrientation(LinearLayout.HORIZONTAL);
+                  statsRow.setPadding(0, 24, 0, 12);
+                  tvTotal = addStatBox(statsRow, "TOTAL", "#FFFFFF");
+                  tvCompleted = addStatBox(statsRow, "DONE", "#00E5FF");
+                  tvAnswered = addStatBox(statsRow, "ANSWERED", "#00E676");
+                  tvFailed = addStatBox(statsRow, "NO ANS", "#FFCA28");
+                  tvRemaining = addStatBox(statsRow, "LEFT", "#FF5252");
+                  root.addView(statsRow);
+
+                  // Progress
+                  tvProgress = new TextView(this);
+                  tvProgress.setText("Progress: 0%");
+                  tvProgress.setTextColor(Color.WHITE);
+                  tvProgress.setPadding(4, 8, 4, 6);
+                  root.addView(tvProgress);
+
+                  progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+                  progressBar.setMax(100);
+                  progressBar.setProgress(0);
+                  root.addView(progressBar);
+
+                  // Live Status Banner
+                  tvLiveStatus = new TextView(this);
+                  tvLiveStatus.setText("STATUS: READY (Select Contacts & Audio)");
+                  tvLiveStatus.setTextColor(Color.parseColor("#00E676"));
+                  tvLiveStatus.setTypeface(null, Typeface.BOLD);
+                  tvLiveStatus.setPadding(24, 24, 24, 24);
+                  LinearLayout.LayoutParams stLp = new LinearLayout.LayoutParams(-1, -2);
+                  stLp.setMargins(0, 20, 0, 20);
+                  tvLiveStatus.setLayoutParams(stLp);
+                  tvLiveStatus.setBackground(makeCard("#0B1930", "#1E90FF"));
+                  root.addView(tvLiveStatus);
+
+                  // Setup Card
+                  LinearLayout card = new LinearLayout(this);
+                  card.setOrientation(LinearLayout.VERTICAL);
+                  card.setPadding(28, 28, 28, 28);
+                  card.setBackground(makeCard("#0E1D36", "#233F6E"));
+
+                  Button btnPickContacts = makeBtn("1. UPLOAD EXCEL (.XLSX) / CSV / TXT", "#1E90FF");
+                  btnPickContacts.setOnClickListener(v -> openFilePicker(REQ_CONTACTS, "*/*"));
+                  card.addView(btnPickContacts);
+
+                  tvContactsLabel = new TextView(this);
+                  tvContactsLabel.setText("No contact file selected");
+                  tvContactsLabel.setTextColor(Color.parseColor("#8B9EC2"));
+                  tvContactsLabel.setPadding(4, 8, 4, 16);
+                  card.addView(tvContactsLabel);
+
+                  etManualNumbers = new EditText(this);
+                  etManualNumbers.setHint("Or paste numbers here (one per line)...");
+                  etManualNumbers.setTextColor(Color.WHITE);
+                  etManualNumbers.setHintTextColor(Color.GRAY);
+                  etManualNumbers.setMinLines(2);
+                  card.addView(etManualNumbers);
+
+                  Button btnLoadManual = makeBtn("ADD PASTED NUMBERS", "#193561");
+                  btnLoadManual.setOnClickListener(v -> loadManualNumbers());
+                  card.addView(btnLoadManual);
+
+                  Button btnPickAudio = makeBtn("2. SELECT AUDIO RECORDING (MP3 / WAV)", "#00838F");
+                  LinearLayout.LayoutParams auLp = new LinearLayout.LayoutParams(-1, -2);
+                  auLp.setMargins(0, 22, 0, 0);
+                  btnPickAudio.setLayoutParams(auLp);
+                  btnPickAudio.setOnClickListener(v -> openFilePicker(REQ_AUDIO, "audio/*"));
+                  card.addView(btnPickAudio);
+
+                  tvAudioLabel = new TextView(this);
+                  tvAudioLabel.setText("No audio file selected");
+                  tvAudioLabel.setTextColor(Color.parseColor("#8B9EC2"));
+                  tvAudioLabel.setPadding(4, 8, 4, 16);
+                  card.addView(tvAudioLabel);
+
+                  TextView lblDelay = new TextView(this);
+                  lblDelay.setText("Call Delay Between Calls (Seconds):");
+                  lblDelay.setTextColor(Color.parseColor("#B0C4DE"));
+                  card.addView(lblDelay);
+
+                  etDelay = new EditText(this);
+                  etDelay.setText("10");
+                  etDelay.setInputType(InputType.TYPE_CLASS_NUMBER);
+                  etDelay.setTextColor(Color.WHITE);
+                  card.addView(etDelay);
+
+                  cbDuplicates = new CheckBox(this);
+                  cbDuplicates.setText("Allow Duplicate Numbers");
+                  cbDuplicates.setTextColor(Color.WHITE);
+                  card.addView(cbDuplicates);
+
+                  // DND Input
+                  LinearLayout dndRow = new LinearLayout(this);
+                  dndRow.setOrientation(LinearLayout.HORIZONTAL);
+                  dndRow.setPadding(0, 14, 0, 0);
+                  etDndInput = new EditText(this);
+                  etDndInput.setHint("DND Number (0300...)");
+                  etDndInput.setTextColor(Color.WHITE);
+                  etDndInput.setHintTextColor(Color.GRAY);
+                  etDndInput.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
+                  Button btnAddDnd = makeBtn("ADD DND", "#B71C1C");
+                  btnAddDnd.setOnClickListener(v -> {
+                      String d = normalizePhone(etDndInput.getText().toString());
+                      if (!d.isEmpty()) {
+                          dndSet.add(d);
+                          etDndInput.setText("");
+                          Toast.makeText(this, "Added to DND: " + d, Toast.LENGTH_SHORT).show();
+                      }
+                  });
+                  dndRow.addView(etDndInput);
+                  dndRow.addView(btnAddDnd);
+                  card.addView(dndRow);
+
+                  root.addView(card);
+
+                  // Control Buttons
+                  LinearLayout ctrlRow = new LinearLayout(this);
+                  ctrlRow.setOrientation(LinearLayout.HORIZONTAL);
+                  ctrlRow.setPadding(0, 24, 0, 20);
+
+                  btnStart = makeBtn("START", "#00C853");
+                  btnStart.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
+                  btnStart.setOnClickListener(v -> startCampaign());
+
+                  btnPause = makeBtn("PAUSE", "#EF6C00");
+                  LinearLayout.LayoutParams pLp = new LinearLayout.LayoutParams(0, -2, 1f);
+                  pLp.setMargins(12, 0, 12, 0);
+                  btnPause.setLayoutParams(pLp);
+                  btnPause.setOnClickListener(v -> pauseCampaign());
+
+                  btnStop = makeBtn("STOP", "#D32F2F");
+                  btnStop.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1f));
+                  btnStop.setOnClickListener(v -> stopCampaign());
+
+                  ctrlRow.addView(btnStart);
+                  ctrlRow.addView(btnPause);
+                  ctrlRow.addView(btnStop);
+                  root.addView(ctrlRow);
+
+                  // Live Log
+                  TextView logTitle = new TextView(this);
+                  logTitle.setText("LIVE CALL REPORT & LOGS");
+                  logTitle.setTextColor(Color.parseColor("#00E5FF"));
+                  logTitle.setTypeface(null, Typeface.BOLD);
+                  logTitle.setPadding(4, 8, 4, 8);
+                  root.addView(logTitle);
+
+                  tvLogBox = new TextView(this);
+                  tvLogBox.setText("Waiting to start campaign...");
+                  tvLogBox.setTextColor(Color.parseColor("#DCE6F5"));
+                  tvLogBox.setTextSize(12);
+                  tvLogBox.setPadding(24, 24, 24, 24);
+                  tvLogBox.setBackground(makeCard("#091324", "#1B335C"));
+                  root.addView(tvLogBox);
+
+                  setContentView(scroll);
+
+                  ActivityCompat.requestPermissions(this, new String[]{
+                      Manifest.permission.CALL_PHONE,
+                      Manifest.permission.READ_PHONE_STATE,
+                      Manifest.permission.ANSWER_PHONE_CALLS,
+                      Manifest.permission.MODIFY_AUDIO_SETTINGS
+                  }, 100);
+
+                  setupPhoneListener();
+              }
+
+              private TextView addStatBox(LinearLayout parent, String label, String colorHex) {
+                  LinearLayout box = new LinearLayout(this);
+                  box.setOrientation(LinearLayout.VERTICAL);
+                  box.setGravity(Gravity.CENTER);
+                  box.setPadding(8, 16, 8, 16);
+                  LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, -2, 1f);
+                  lp.setMargins(6, 0, 6, 0);
+                  box.setLayoutParams(lp);
+                  box.setBackground(makeCard("#0E1E38", "#1E3B6E"));
+
+                  TextView val = new TextView(this);
+                  val.setText("0");
+                  val.setTextColor(Color.parseColor(colorHex));
+                  val.setTextSize(18);
+                  val.setTypeface(null, Typeface.BOLD);
+
+                  TextView lbl = new TextView(this);
+                  lbl.setText(label);
+                  lbl.setTextColor(Color.parseColor("#8B9EC2"));
+                  lbl.setTextSize(9);
+
+                  box.addView(val);
+                  box.addView(lbl);
+                  parent.addView(box);
+                  return val;
+              }
+
+              private GradientDrawable makeCard(String bgHex, String strokeHex) {
+                  GradientDrawable gd = new GradientDrawable();
+                  gd.setColor(Color.parseColor(bgHex));
+                  gd.setCornerRadius(22);
+                  gd.setStroke(2, Color.parseColor(strokeHex));
+                  return gd;
+              }
+
+              private Button makeBtn(String text, String bgHex) {
+                  Button b = new Button(this);
+                  b.setText(text);
+                  b.setTextColor(Color.WHITE);
+                  b.setTypeface(null, Typeface.BOLD);
+                  GradientDrawable gd = new GradientDrawable();
+                  gd.setColor(Color.parseColor(bgHex));
+                  gd.setCornerRadius(16);
+                  b.setBackground(gd);
+                  return b;
+              }
+
+              private void openFilePicker(int code, String mime) {
+                  Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                  i.addCategory(Intent.CATEGORY_OPENABLE);
+                  i.setType(mime);
+                  startActivityForResult(i, code);
+              }
+
+              @Override
+              protected void onActivityResult(int req, int res, Intent data) {
+                  super.onActivityResult(req, res, data);
+                  if (res != Activity.RESULT_OK || data == null || data.getData() == null) return;
+                  Uri uri = data.getData();
+                  if (req == REQ_AUDIO) {
+                      selectedAudioUri = uri;
+                      tvAudioLabel.setText("Audio Ready: " + getFileName(uri));
+                      tvAudioLabel.setTextColor(Color.parseColor("#00E676"));
+                  } else if (req == REQ_CONTACTS) {
+                      parseContactsUri(uri);
+                  }
+              }
+
+              private String getFileName(Uri uri) {
+                  String name = "file";
+                  try (Cursor c = getContentResolver().query(uri, null, null, null, null)) {
+                      if (c != null && c.moveToFirst()) {
+                          int idx = c.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                          if (idx >= 0) name = c.getString(idx);
+                      }
+                  } catch (Exception ignored) {}
+                  return name;
+              }
+
+              private void loadManualNumbers() {
+                  String raw = etManualNumbers.getText().toString();
+                  List<String> list = new ArrayList<>();
+                  for (String line : raw.split("\\r?\\n")) {
+                      String n = normalizePhone(line);
+                      if (n.length() >= 7) list.add(n);
+                  }
+                  addParsedNumbers(list, "Manual Paste");
+                  etManualNumbers.setText("");
+              }
+
+              private void parseContactsUri(Uri uri) {
+                  String name = getFileName(uri).toLowerCase();
+                  List<String> extracted = new ArrayList<>();
+                  try (InputStream is = getContentResolver().openInputStream(uri)) {
+                      if (name.endsWith(".xlsx")) {
+                          extracted.addAll(parseXlsxStream(is));
+                      } else {
+                          BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                          String line;
+                          while ((line = br.readLine()) != null) {
+                              for (String part : line.split("[,;\\t\\s]+")) {
+                                  String n = normalizePhone(part);
+                                  if (n.length() >= 7) extracted.add(n);
+                              }
+                          }
+                      }
+                      addParsedNumbers(extracted, name);
+                  } catch (Exception e) {
+                      Toast.makeText(this, "File read error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                  }
+              }
+
+              private List<String> parseXlsxStream(InputStream is) throws Exception {
+                  List<String> sharedStrings = new ArrayList<>();
+                  List<String> numbers = new ArrayList<>();
+                  byte[] sheetBytes = null;
+
+                  ZipInputStream zis = new ZipInputStream(is);
+                  ZipEntry entry;
+                  while ((entry = zis.getNextEntry()) != null) {
+                      if (entry.getName().equals("xl/sharedStrings.xml")) {
+                          sharedStrings = parseXmlStrings(zis);
+                      } else if (entry.getName().equals("xl/worksheets/sheet1.xml")) {
+                          java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+                          byte[] buf = new byte[4096];
+                          int len;
+                          while ((len = zis.read(buf)) > 0) baos.write(buf, 0, len);
+                          sheetBytes = baos.toByteArray();
+                      }
+                  }
+                  if (sheetBytes != null) {
+                      XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
+                      parser.setInput(new java.io.ByteArrayInputStream(sheetBytes), "UTF-8");
+                      boolean isShared = false;
+                      int event = parser.getEventType();
+                      while (event != XmlPullParser.END_DOCUMENT) {
+                          if (event == XmlPullParser.START_TAG && parser.getName().equals("c")) {
+                              String t = parser.getAttributeValue(null, "t");
+                              isShared = "s".equals(t);
+                          } else if (event == XmlPullParser.START_TAG && parser.getName().equals("v")) {
+                              String val = parser.nextText();
+                              if (isShared) {
+                                  int idx = Integer.parseInt(val);
+                                  if (idx >= 0 && idx < sharedStrings.size()) val = sharedStrings.get(idx);
+                              }
+                              String phone = normalizePhone(val);
+                              if (phone.length() >= 7) numbers.add(phone);
+                          }
+                          event = parser.next();
+                      }
+                  }
+                  return numbers;
+              }
+
+              private List<String> parseXmlStrings(InputStream is) throws Exception {
+                  List<String> list = new ArrayList<>();
+                  XmlPullParser parser = XmlPullParserFactory.newInstance().newPullParser();
+                  parser.setInput(is, "UTF-8");
+                  int event = parser.getEventType();
+                  while (event != XmlPullParser.END_DOCUMENT) {
+                      if (event == XmlPullParser.START_TAG && parser.getName().equals("t")) {
+                          list.add(parser.nextText());
+                      }
+                      event = parser.next();
+                  }
+                  return list;
+              }
+
+              private void addParsedNumbers(List<String> list, String sourceName) {
+                  Set<String> seen = new HashSet<>();
+                  for (ContactItem c : contacts) seen.add(c.number);
+                  int added = 0;
+                  for (String n : list) {
+                      if (!cbDuplicates.isChecked() && seen.contains(n)) continue;
+                      seen.add(n);
+                      ContactItem item = new ContactItem(n);
+                      if (dndSet.contains(n)) item.status = "SKIPPED_DND";
+                      contacts.add(item);
+                      added++;
+                  }
+                  tvContactsLabel.setText("Loaded: " + contacts.size() + " numbers (" + sourceName + ")");
+                  tvContactsLabel.setTextColor(Color.parseColor("#00E676"));
+                  updateStatsUI();
+                  Toast.makeText(this, "Added " + added + " numbers!", Toast.LENGTH_SHORT).show();
+              }
+
+              private String normalizePhone(String raw) {
+                  if (raw == null) return "";
+                  String c = raw.replaceAll("[^\\d+]", "").trim();
+                  if (c.endsWith(".0")) c = c.substring(0, c.length() - 2);
+                  if (c.startsWith("92") && c.length() == 12) return "0" + c.substring(2);
+                  if (c.startsWith("+92") && c.length() == 13) return "0" + c.substring(3);
+                  if (c.startsWith("3") && c.length() == 10) return "0" + c;
+                  return c;
+              }
+
+              private void startCampaign() {
+                  if (contacts.isEmpty()) {
+                      Toast.makeText(this, "Please upload contacts first!", Toast.LENGTH_SHORT).show();
+                      return;
+                  }
+                  if (selectedAudioUri == null) {
+                      Toast.makeText(this, "Please select MP3/WAV audio first!", Toast.LENGTH_SHORT).show();
+                      return;
+                  }
+                  isRunning = true;
+                  isPaused = false;
+                  tvLiveStatus.setText("STATUS: CAMPAIGN RUNNING...");
+                  dialNextContact();
+              }
+
+              private void pauseCampaign() {
+                  isPaused = true;
+                  tvLiveStatus.setText("STATUS: PAUSED");
+              }
+
+              private void stopCampaign() {
+                  isRunning = false;
+                  isPaused = false;
+                  stopAudio();
+                  endCall();
+                  tvLiveStatus.setText("STATUS: STOPPED");
+              }
+
+              private void dialNextContact() {
+                  if (!isRunning || isPaused) return;
+                  currentIndex = -1;
+                  for (int i = 0; i < contacts.size(); i++) {
+                      if ("PENDING".equals(contacts.get(i).status)) {
+                          currentIndex = i;
+                          break;
+                      }
+                  }
+                  if (currentIndex == -1) {
+                      isRunning = false;
+                      tvLiveStatus.setText("STATUS: CAMPAIGN COMPLETED!");
+                      updateStatsUI();
+                      return;
+                  }
+
+                  ContactItem item = contacts.get(currentIndex);
+                  item.status = "DIALING";
+                  item.time = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+                  wasOffhook = false;
+                  tvLiveStatus.setText("CALLING: " + item.number + " (" + (currentIndex + 1) + "/" + contacts.size() + ")");
+                  updateStatsUI();
+
+                  Intent callIntent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + Uri.encode(item.number)));
+                  if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                      startActivity(callIntent);
+                  }
+              }
+
+              private void setupPhoneListener() {
+                  TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                  tm.listen(new PhoneStateListener() {
+                      @Override
+                      public void onCallStateChanged(int state, String phoneNumber) {
+                          if (!isRunning || currentIndex < 0 || currentIndex >= contacts.size()) return;
+                          ContactItem item = contacts.get(currentIndex);
+
+                          if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
+                              wasOffhook = true;
+                              offhookTime = System.currentTimeMillis();
+                              handler.postDelayed(() -> playCampaignAudio(), 4500);
+                          } else if (state == TelephonyManager.CALL_STATE_IDLE && wasOffhook) {
+                              handler.removeCallbacksAndMessages(null);
+                              stopAudio();
+                              int dur = (int) ((System.currentTimeMillis() - offhookTime) / 1000);
+                              item.duration = dur;
+                              item.status = dur >= 6 ? "ANSWERED" : "NO_ANSWER";
+                              wasOffhook = false;
+                              updateStatsUI();
+
+                              int delaySec = 10;
+                              try { delaySec = Math.max(3, Integer.parseInt(etDelay.getText().toString())); } catch (Exception ignored) {}
+                              tvLiveStatus.setText("WAITING " + delaySec + "s BEFORE NEXT CALL...");
+                              handler.postDelayed(() -> dialNextContact(), delaySec * 1000L);
+                          }
+                      }
+                  }, PhoneStateListener.LISTEN_CALL_STATE);
+              }
+
+              private void playCampaignAudio() {
+                  if (!isRunning || !wasOffhook) return;
+                  try {
+                      AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                      am.setMode(AudioManager.MODE_IN_CALL);
+                      am.setSpeakerphoneOn(true);
+
+                      mediaPlayer = new MediaPlayer();
+                      mediaPlayer.setDataSource(this, selectedAudioUri);
+                      mediaPlayer.setOnPreparedListener(mp -> {
+                          tvLiveStatus.setText("PLAYING AUDIO ON CALL...");
+                          mp.start();
+                      });
+                      mediaPlayer.setOnCompletionListener(mp -> {
+                          tvLiveStatus.setText("AUDIO FINISHED - ENDING CALL...");
+                          endCall();
+                      });
+                      mediaPlayer.prepareAsync();
+                  } catch (Exception e) {
+                      endCall();
+                  }
+              }
+
+              private void stopAudio() {
+                  try {
+                      if (mediaPlayer != null) {
+                          if (mediaPlayer.isPlaying()) mediaPlayer.stop();
+                          mediaPlayer.release();
+                          mediaPlayer = null;
+                      }
+                      AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                      am.setSpeakerphoneOn(false);
+                      am.setMode(AudioManager.MODE_NORMAL);
+                  } catch (Exception ignored) {}
+              }
+
+              private void endCall() {
+                  try {
+                      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                          TelecomManager tm = (TelecomManager) getSystemService(Context.TELECOM_SERVICE);
+                          if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED) {
+                              tm.endCall();
+                          }
+                      }
+                  } catch (Exception ignored) {}
+              }
+
+              private void updateStatsUI() {
+                  int total = contacts.size(), ans = 0, noAns = 0, rem = 0, dnd = 0;
+                  StringBuilder sb = new StringBuilder();
+                  for (int i = 0; i < contacts.size(); i++) {
+                      ContactItem c = contacts.get(i);
+                      if ("ANSWERED".equals(c.status)) ans++;
+                      else if ("NO_ANSWER".equals(c.status)) noAns++;
+                      else if ("SKIPPED_DND".equals(c.status)) dnd++;
+                      else rem++;
+
+                      if (i < 50) {
+                          sb.append(i + 1).append(". ").append(c.number)
+                            .append(" | ").append(c.status)
+                            .append(" | ").append(c.duration).append("s\n");
+                      }
+                  }
+                  int done = ans + noAns + dnd;
+                  int pct = total > 0 ? (done * 100 / total) : 0;
+
+                  tvTotal.setText(String.valueOf(total));
+                  tvCompleted.setText(String.valueOf(done));
+                  tvAnswered.setText(String.valueOf(ans));
+                  tvFailed.setText(String.valueOf(noAns));
+                  tvRemaining.setText(String.valueOf(rem));
+                  tvProgress.setText("Progress: " + pct + "%");
+                  progressBar.setProgress(pct);
+                  if (!contacts.isEmpty()) tvLogBox.setText(sb.toString());
+              }
           }
+          EOF
 
-          private fun requestCallPermission() {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-              ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CALL_PHONE, Manifest.permission.MODIFY_AUDIO_SETTINGS), 101)
-            }
-          }
+      - name: Initialize Gradle Wrapper & Build All-In-One APK
+        run: |
+          gradle wrapper --gradle-version 8.5
+          chmod +x gradlew
+          ./gradlew assembleDebug
 
-          private fun startAutoCampaign() {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-              requestCallPermission()
-              Toast.makeText(this, "Please Allow Phone Call Permission First!", Toast.LENGTH_SHORT).show()
-              return
-            }
-
-            val raw = etNumbers.text.toString().lines().map { it.trim() }.filter { it.isNotEmpty() }
-            if (raw.isEmpty()) {
-              Toast.makeText(this, "Enter at least 1 phone number!", Toast.LENGTH_SHORT).show()
-              return
-            }
-
-            numberQueue = raw
-            currentIndex = 0
-            isRunning = true
-            dialNextNumber()
-          }
-
-          private fun dialNextNumber() {
-            if (!isRunning) return
-            if (currentIndex >= numberQueue.size) {
-              isRunning = false
-              tvLiveStatus.text = "Status: All ${numberQueue.size} Calls Completed!"
-              Toast.makeText(this, "All Calls Completed!", Toast.LENGTH_LONG).show()
-              return
-            }
-
-            val targetNum = numberQueue[currentIndex]
-            tvLiveStatus.text = "Calling (${currentIndex + 1}/${numberQueue.size}): $targetNum"
-
-            try {
-              val callIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$targetNum"))
-              startActivity(callIntent)
-            } catch (e: Exception) {
-              Toast.makeText(this, "Call Error: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-
-            // Enable Speaker & Auto-Play Recording after 4 seconds so ring/answer connects
-            if (cbAutoPlay.isChecked && audioUri != null) {
-              handler.postDelayed({
-                if (isRunning) {
-                  enableLoudspeaker()
-                  playRecording()
-                }
-              }, 4000L)
-            }
-
-            val gapSec = etDelay.text.toString().toLongOrNull() ?: 25L
-            currentIndex++
-            handler.postDelayed({
+      - name: Upload AKS Auto Call Center APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AKS-Auto-Call-Center-All-In-One-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
